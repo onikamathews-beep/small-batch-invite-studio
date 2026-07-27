@@ -1,0 +1,1647 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8dce7">
+  <title>Small Batch Invite Studio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --page-1:#ffe1ea;
+      --page-2:#eee5ff;
+      --page-3:#e4f1df;
+      --ink:#533d48;
+      --muted:#725e68;
+      --accent:#a84970;
+      --accent-2:#8a6cc7;
+      --soft:#fce4ed;
+      --soft-2:#eadffd;
+      --soft-3:#dcebd8;
+      --green:#59715e;
+      --gold:#d5a653;
+      --panel:#fffafcf2;
+      --shadow:0 24px 68px rgba(91,57,72,.18);
+    }
+
+    * { box-sizing:border-box; }
+
+    body {
+      margin:0;
+      min-height:100vh;
+      font-family:"DM Sans",system-ui,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 8% 10%,rgba(255,255,255,.72) 0 82px,transparent 83px),
+        radial-gradient(circle at 90% 7%,rgba(255,255,255,.52) 0 70px,transparent 71px),
+        linear-gradient(145deg,var(--page-1),var(--page-2) 48%,var(--page-3));
+    }
+
+    button,input,textarea,select { font:inherit; }
+    button { cursor:pointer; }
+    .hidden { display:none !important; }
+
+    .app {
+      display:grid;
+      grid-template-columns:380px minmax(0,1fr);
+      min-height:100vh;
+    }
+
+    .editor {
+      position:sticky;
+      top:0;
+      height:100vh;
+      overflow:auto;
+      padding:20px 16px 30px;
+      background:var(--panel);
+      border-right:1px solid rgba(104,73,87,.12);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+    }
+
+    .brand {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:8px;
+    }
+
+    .brand-mark {
+      width:48px;
+      height:48px;
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+      border-radius:16px;
+      color:white;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      box-shadow:0 12px 24px rgba(110,66,87,.18);
+      font-size:1.4rem;
+    }
+
+    .brand h1 {
+      margin:0;
+      color:var(--accent);
+      font-family:"Playfair Display",serif;
+      font-size:1.42rem;
+      line-height:1.06;
+    }
+
+    .intro {
+      margin:0 0 14px;
+      color:var(--muted);
+      font-size:.91rem;
+      line-height:1.5;
+    }
+
+    .hosting-warning {
+      display:none;
+      margin:0 0 14px;
+      padding:12px 13px;
+      border:1px solid rgba(158,64,83,.14);
+      border-radius:15px;
+      color:#873b4b;
+      background:#fff1f4;
+      font-size:.82rem;
+      line-height:1.45;
+    }
+
+    .hosting-warning.show { display:block; }
+
+    .toolbar {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:9px;
+      margin-bottom:14px;
+    }
+
+    .btn {
+      min-height:44px;
+      border:0;
+      border-radius:999px;
+      padding:11px 14px;
+      font-weight:800;
+      transition:transform .18s ease,opacity .18s ease,box-shadow .18s ease;
+    }
+
+    .btn:hover { transform:translateY(-2px); }
+
+    .btn.primary {
+      color:white;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      box-shadow:0 11px 22px rgba(104,65,84,.18);
+    }
+
+    .btn.secondary {
+      color:var(--accent);
+      background:white;
+      border:1px solid rgba(168,73,112,.13);
+      box-shadow:0 8px 18px rgba(104,65,84,.06);
+    }
+
+    .btn.working {
+      opacity:.72;
+      pointer-events:none;
+    }
+
+    .section {
+      margin-bottom:13px;
+      padding:14px;
+      border:1px solid rgba(168,73,112,.08);
+      border-radius:19px;
+      background:rgba(255,255,255,.89);
+      box-shadow:0 9px 22px rgba(95,63,77,.05);
+    }
+
+    .section h2 {
+      margin:0 0 11px;
+      color:var(--accent);
+      font-size:.94rem;
+    }
+
+    label {
+      display:block;
+      margin-bottom:10px;
+      color:var(--ink);
+      font-size:.82rem;
+      font-weight:800;
+    }
+
+    input[type="text"],
+    input[type="datetime-local"],
+    input[type="url"],
+    textarea,
+    select {
+      width:100%;
+      margin-top:6px;
+      padding:11px 12px;
+      border:1px solid rgba(119,87,102,.18);
+      border-radius:14px;
+      color:var(--ink);
+      background:white;
+      outline:none;
+    }
+
+    input:focus,textarea:focus,select:focus {
+      border-color:rgba(168,73,112,.55);
+      box-shadow:0 0 0 3px rgba(168,73,112,.08);
+    }
+
+    textarea {
+      min-height:92px;
+      resize:vertical;
+    }
+
+    .two {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:9px;
+    }
+
+    .theme-grid {
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:8px;
+    }
+
+    .theme-card {
+      border:2px solid transparent;
+      border-radius:15px;
+      padding:9px;
+      color:var(--ink);
+      background:white;
+      font-size:.75rem;
+      font-weight:800;
+    }
+
+    .theme-card.active { border-color:var(--accent); }
+
+    .theme-dots {
+      display:flex;
+      justify-content:center;
+      gap:5px;
+      margin-bottom:6px;
+    }
+
+    .theme-dots span {
+      width:17px;
+      height:17px;
+      border-radius:999px;
+    }
+
+    .status {
+      min-height:20px;
+      margin-top:8px;
+      color:var(--green);
+      font-size:.79rem;
+      font-weight:800;
+    }
+
+    .code-panel {
+      display:none;
+      margin-top:12px;
+    }
+
+    .code-panel.show { display:block; }
+
+    .code-actions {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-bottom:8px;
+    }
+
+    .code-box {
+      width:100%;
+      min-height:280px;
+      padding:12px;
+      border:1px solid rgba(119,87,102,.18);
+      border-radius:14px;
+      color:#fff4fa;
+      background:#251f24;
+      font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      white-space:pre;
+      overflow:auto;
+      resize:vertical;
+    }
+
+    .preview-pane {
+      padding:24px;
+      overflow:auto;
+    }
+
+    .toast {
+      position:fixed;
+      left:50%;
+      bottom:22px;
+      z-index:9999;
+      width:min(calc(100% - 28px),520px);
+      transform:translate(-50%,24px);
+      opacity:0;
+      pointer-events:none;
+      padding:14px 16px;
+      border-radius:17px;
+      color:white;
+      background:#4f4050;
+      box-shadow:0 18px 44px rgba(43,28,37,.28);
+      transition:opacity .2s ease,transform .2s ease;
+    }
+
+    .toast.show {
+      opacity:1;
+      transform:translate(-50%,0);
+    }
+
+    .toast.success { background:#4e7258; }
+    .toast.error { background:#9e4053; }
+    .toast.info { background:#665080; }
+
+    .toast strong {
+      display:block;
+      margin-bottom:3px;
+    }
+
+    .toast span {
+      font-size:.86rem;
+      line-height:1.4;
+    }
+
+    /* Preview invite */
+    .preview-stage {
+      position:relative;
+      width:min(100%,980px);
+      margin:0 auto;
+    }
+
+    .float {
+      position:absolute;
+      z-index:0;
+      pointer-events:none;
+      user-select:none;
+      animation:floaty 5s ease-in-out infinite;
+      filter:drop-shadow(0 8px 15px rgba(94,62,77,.11));
+    }
+
+    .f1 { left:-4px;top:25px;font-size:2rem; }
+    .f2 { right:0;top:80px;font-size:1.9rem;animation-delay:.7s; }
+    .f3 { left:8px;bottom:32px;font-size:2rem;animation-delay:1.3s; }
+    .f4 { right:12px;bottom:24px;font-size:1.85rem;animation-delay:1.7s; }
+
+    @keyframes floaty {
+      0%,100% { transform:translateY(0); }
+      50% { transform:translateY(-10px); }
+    }
+
+    .preview-card {
+      position:relative;
+      z-index:1;
+      overflow:hidden;
+      padding:14px;
+      border:2px solid rgba(255,255,255,.92);
+      border-radius:38px;
+      background:rgba(255,255,255,.84);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+
+    .preview-inner {
+      position:relative;
+      z-index:1;
+      overflow:hidden;
+      border:2px solid rgba(213,166,83,.42);
+      border-radius:29px;
+      background:
+        linear-gradient(rgba(255,255,255,.83),rgba(255,255,255,.83)),
+        repeating-linear-gradient(45deg,rgba(230,154,182,.05) 0 14px,rgba(234,223,253,.06) 14px 28px);
+    }
+
+    .preview-actions {
+      position:absolute;
+      z-index:5;
+      top:18px;
+      right:18px;
+    }
+
+    .calendar-preview {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height:44px;
+      padding:11px 16px;
+      border-radius:999px;
+      color:white;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      box-shadow:0 12px 24px rgba(97,64,80,.18);
+      text-decoration:none;
+      font-weight:800;
+    }
+
+    .preview-hero {
+      display:grid;
+      grid-template-columns:minmax(0,1fr) minmax(260px,.82fr);
+      align-items:center;
+      gap:8px;
+      min-height:525px;
+      padding:72px 38px 22px;
+    }
+
+    .preview-eyebrow {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 16px;
+      border-radius:999px;
+      color:var(--accent);
+      background:rgba(255,255,255,.89);
+      box-shadow:0 8px 18px rgba(96,63,78,.06);
+      font-size:.79rem;
+      font-weight:800;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+
+    .preview-eyebrow::before,
+    .preview-eyebrow::after {
+      content:"✦";
+      color:var(--gold);
+      font-size:.75rem;
+    }
+
+    .preview-title {
+      margin:22px 0 0;
+      color:var(--accent);
+      font-family:"Playfair Display",serif;
+      font-size:clamp(3.45rem,7.4vw,6.1rem);
+      line-height:.9;
+      letter-spacing:-.052em;
+    }
+
+    .with-line {
+      display:block;
+      margin:17px 0 4px;
+      color:var(--green);
+      font-size:1rem;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .host-line {
+      display:block;
+      max-width:520px;
+      font-family:"Playfair Display",serif;
+      font-size:clamp(1.85rem,4vw,2.95rem);
+      line-height:1.05;
+    }
+
+    .preview-message {
+      max-width:570px;
+      margin:20px 0 22px;
+      color:var(--muted);
+      font-size:1.07rem;
+      line-height:1.72;
+    }
+
+    .date-ribbon {
+      display:inline-flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:9px 20px;
+      padding:15px 18px;
+      border-radius:22px;
+      background:linear-gradient(135deg,var(--soft),var(--soft-2));
+      box-shadow:0 10px 22px rgba(96,63,78,.07);
+    }
+
+    .date-ribbon strong { color:var(--accent); }
+
+    .art-wrap {
+      position:relative;
+      min-height:410px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+    }
+
+    .art-blob {
+      position:absolute;
+      right:3%;
+      bottom:6%;
+      width:92%;
+      aspect-ratio:1/1;
+      border:2px solid rgba(255,255,255,.88);
+      border-radius:47% 53% 58% 42% / 45% 44% 56% 55%;
+      background:radial-gradient(circle at 42% 36%,rgba(255,255,255,.95),rgba(255,244,249,.88) 42%,rgba(224,239,222,.82) 100%);
+      box-shadow:inset 0 0 0 8px rgba(255,255,255,.26),0 18px 36px rgba(107,71,87,.09);
+    }
+
+    .art-frame {
+      position:relative;
+      z-index:2;
+      width:min(100%,370px);
+      height:340px;
+      overflow:hidden;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+    }
+
+    .art-frame img {
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      object-position:center top;
+      filter:drop-shadow(0 12px 18px rgba(68,46,55,.16));
+    }
+
+    .heart {
+      position:absolute;
+      z-index:3;
+      color:var(--accent);
+      animation:pulse 2.5s ease-in-out infinite;
+    }
+
+    .h1 { top:17%;right:5%;font-size:1.8rem; }
+    .h2 { top:12%;left:12%;font-size:1.3rem;animation-delay:.8s; }
+
+    @keyframes pulse {
+      0%,100% { transform:scale(1); }
+      50% { transform:scale(1.12); }
+    }
+
+    .preview-details {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      padding:0 38px 27px;
+    }
+
+    .preview-detail {
+      padding:18px 16px;
+      border:1px solid rgba(168,73,112,.13);
+      border-radius:24px;
+      background:rgba(255,255,255,.80);
+      box-shadow:0 10px 22px rgba(101,67,82,.06);
+    }
+
+    .detail-icon {
+      width:48px;
+      height:48px;
+      margin-bottom:10px;
+      display:grid;
+      place-items:center;
+      border-radius:16px;
+      background:linear-gradient(135deg,var(--soft),var(--soft-2));
+      font-size:1.35rem;
+    }
+
+    .detail-label {
+      margin-bottom:7px;
+      color:var(--accent);
+      font-size:.73rem;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .detail-value {
+      font-size:1rem;
+      font-weight:700;
+      line-height:1.55;
+    }
+
+    .detail-value a {
+      color:inherit;
+      text-decoration:none;
+      border-bottom:1px dashed rgba(168,73,112,.35);
+    }
+
+    .closing-wrap {
+      padding:0 38px 38px;
+      text-align:center;
+    }
+
+    .closing {
+      display:inline-block;
+      padding:16px 22px;
+      border-radius:22px;
+      color:var(--accent);
+      background:linear-gradient(135deg,var(--soft),var(--soft-3));
+      font-weight:800;
+      line-height:1.55;
+    }
+
+    @media (max-width:1020px) {
+      .app { grid-template-columns:1fr; }
+      .editor {
+        position:relative;
+        height:auto;
+        border-right:0;
+        border-bottom:1px solid rgba(104,73,87,.12);
+      }
+    }
+
+    @media (max-width:760px) {
+      .preview-pane { padding:10px; }
+      .preview-card { padding:10px;border-radius:30px; }
+      .preview-inner { border-radius:22px; }
+      .preview-actions {
+        position:static;
+        display:flex;
+        justify-content:center;
+        padding:18px 18px 0;
+      }
+      .preview-hero {
+        grid-template-columns:1fr;
+        min-height:auto;
+        padding:24px 20px 8px;
+        text-align:center;
+      }
+      .preview-message {
+        margin-left:auto;
+        margin-right:auto;
+      }
+      .date-ribbon { justify-content:center; }
+      .art-wrap { min-height:auto;margin-top:8px; }
+      .art-blob {
+        right:50%;
+        width:min(94%,380px);
+        transform:translateX(50%);
+      }
+      .art-frame {
+        width:min(100%,330px);
+        height:300px;
+      }
+      .preview-details {
+        grid-template-columns:1fr;
+        padding:6px 20px 24px;
+      }
+      .preview-detail {
+        display:grid;
+        grid-template-columns:50px 1fr;
+        grid-template-areas:"icon label" "icon value";
+        column-gap:12px;
+        text-align:left;
+      }
+      .detail-icon { grid-area:icon;margin:0; }
+      .detail-label { grid-area:label;margin-top:3px; }
+      .detail-value { grid-area:value; }
+      .closing-wrap { padding:0 20px 28px; }
+    }
+
+    @media (max-width:520px) {
+      .toolbar,.two,.code-actions { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="editor">
+      <div class="brand">
+        <div class="brand-mark">✦</div>
+        <h1>Small Batch<br>Invite Studio</h1>
+      </div>
+
+      <p class="intro">
+        Customize the invitation here, then copy one embed-code block into the HTML section on your website.
+      </p>
+
+      <div id="hostingWarning" class="hosting-warning">
+        This copy is opened from your device. Upload both GitHub files and open the GitHub Pages app before copying the final embed code, so the chibi image has a public web address.
+      </div>
+
+      <div class="toolbar">
+        <button id="copyBtn" class="btn primary" type="button">Copy Embed Code</button>
+        <button id="showCodeBtn" class="btn secondary" type="button">Show Embed Code</button>
+        <button id="downloadTxtBtn" class="btn secondary" type="button">Download Code (.txt)</button>
+        <button id="resetBtn" class="btn secondary" type="button">Reset</button>
+      </div>
+
+      <section class="section">
+        <h2>Quick Template</h2>
+        <label>
+          Event type
+          <select id="template">
+            <option value="service">Service Plans</option>
+            <option value="family">Family Worship</option>
+            <option value="dinner">Dinner Together</option>
+            <option value="custom">Custom Event</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="section">
+        <h2>Wording</h2>
+        <label>Top label<input id="topLabel" type="text"></label>
+        <label>Main title<input id="title" type="text"></label>
+        <label>Host line<input id="hostLine" type="text"></label>
+        <label>Message<textarea id="message"></textarea></label>
+        <label>Closing note<input id="closing" type="text"></label>
+      </section>
+
+      <section class="section">
+        <h2>Date and Location</h2>
+        <label>Date shown<input id="dateDisplay" type="text"></label>
+        <label>Time shown<input id="timeDisplay" type="text"></label>
+        <label>Venue<input id="venueName" type="text"></label>
+        <label>Street address<input id="streetAddress" type="text"></label>
+        <label>City, state and ZIP<input id="cityStateZip" type="text"></label>
+        <label>Google Maps link<input id="mapsUrl" type="url"></label>
+      </section>
+
+      <section class="section">
+        <h2>Add to Calendar</h2>
+        <label>Calendar title<input id="calendarTitle" type="text"></label>
+        <label>Calendar description<textarea id="calendarDescription"></textarea></label>
+        <div class="two">
+          <label>Start<input id="startDateTime" type="datetime-local"></label>
+          <label>End<input id="endDateTime" type="datetime-local"></label>
+        </div>
+        <label>
+          Timezone
+          <select id="timezone">
+            <option value="America/Phoenix">America/Phoenix</option>
+            <option value="America/Denver">America/Denver</option>
+            <option value="America/Los_Angeles">America/Los_Angeles</option>
+            <option value="America/Chicago">America/Chicago</option>
+            <option value="America/New_York">America/New_York</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="section">
+        <h2>Image</h2>
+        <label>
+          Display
+          <select id="showImage">
+            <option value="yes">Show welcoming chibis</option>
+            <option value="no">No image</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="section">
+        <h2>Color Theme</h2>
+        <div id="themeGrid" class="theme-grid"></div>
+      </section>
+
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+
+      <section id="codePanel" class="section code-panel">
+        <h2>Website Embed Code</h2>
+        <div class="code-actions">
+          <button id="selectCodeBtn" class="btn secondary" type="button">Select All Code</button>
+          <button id="hideCodeBtn" class="btn secondary" type="button">Hide Code</button>
+        </div>
+        <textarea id="codeBox" class="code-box" readonly spellcheck="false"></textarea>
+      </section>
+    </aside>
+
+    <main class="preview-pane">
+      <div id="preview"></div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="assertive">
+    <strong id="toastTitle"></strong>
+    <span id="toastMessage"></span>
+  </div>
+
+<script>
+const THEMES = [
+  {
+    name:"Blush Bloom",
+    vars:{
+      page1:"#ffe1ea",page2:"#eee5ff",page3:"#e4f1df",
+      ink:"#533d48",muted:"#725e68",accent:"#a84970",accent2:"#8a6cc7",
+      soft:"#fce4ed",soft2:"#eadffd",soft3:"#dcebd8",green:"#59715e",gold:"#d5a653"
+    }
+  },
+  {
+    name:"Lavender Tea",
+    vars:{
+      page1:"#f2e8ff",page2:"#fbf6ff",page3:"#e6f0e3",
+      ink:"#4f4356",muted:"#706477",accent:"#8e61ae",accent2:"#6e75bd",
+      soft:"#f2e9fc",soft2:"#e5d8f8",soft3:"#dcebd9",green:"#58705f",gold:"#cda75a"
+    }
+  },
+  {
+    name:"Sage and Cream",
+    vars:{
+      page1:"#eef6eb",page2:"#fffaf4",page3:"#e4eddc",
+      ink:"#495149",muted:"#687168",accent:"#728f6a",accent2:"#9a8266",
+      soft:"#edf5e9",soft2:"#f6efe3",soft3:"#dbe9d4",green:"#52665a",gold:"#c4a060"
+    }
+  },
+  {
+    name:"Navy and Sand",
+    vars:{
+      page1:"#e9eef5",page2:"#f7f0e4",page3:"#e4e9e5",
+      ink:"#28394f",muted:"#5e6875",accent:"#354f73",accent2:"#9c7b52",
+      soft:"#edf1f7",soft2:"#f5ebdb",soft3:"#e1ebe2",green:"#52685c",gold:"#bd945a"
+    }
+  }
+];
+
+const TEMPLATES = {
+  service:{
+    topLabel:"See You Soon!",
+    title:"Service Plans",
+    hostLine:"The Mitchel Family",
+    message:"We’re so glad you’ll be joining us for service! Thank you for making the drive up to Superior. We’re looking forward to spending the day together.",
+    closing:"We can’t wait to see you!",
+    calendarTitle:"Service Plans with the Mitchel Family",
+    calendarDescription:"We’re so glad you’ll be joining us for service! Thank you for making the drive up to Superior. We’re looking forward to spending the day together."
+  },
+  family:{
+    topLabel:"See You Soon!",
+    title:"Family Worship",
+    hostLine:"Together at Our Place",
+    message:"We’re looking forward to spending time together for family worship. Thank you for setting aside the evening to join us.",
+    closing:"We’re glad we get to share this time together!",
+    calendarTitle:"Family Worship",
+    calendarDescription:"Family worship together."
+  },
+  dinner:{
+    topLabel:"Dinner Plans",
+    title:"Dinner Together",
+    hostLine:"Good Food and Good Company",
+    message:"We’re looking forward to having dinner together. Thank you for making time to come and spend the evening with us.",
+    closing:"Come hungry. We’ll take care of the rest!",
+    calendarTitle:"Dinner Together",
+    calendarDescription:"Dinner together."
+  },
+  custom:{
+    topLabel:"Save the Date",
+    title:"Our Event",
+    hostLine:"Hosted with Care",
+    message:"We’re looking forward to spending this time together.",
+    closing:"See you soon!",
+    calendarTitle:"Our Event",
+    calendarDescription:"Event details."
+  }
+};
+
+const DEFAULTS = {
+  template:"service",
+  topLabel:TEMPLATES.service.topLabel,
+  title:TEMPLATES.service.title,
+  hostLine:TEMPLATES.service.hostLine,
+  message:TEMPLATES.service.message,
+  closing:TEMPLATES.service.closing,
+  dateDisplay:"Saturday, August 15, 2026",
+  timeDisplay:"9:30 AM to 2:30 PM",
+  venueName:"Kingdom Hall",
+  streetAddress:"639 W Hill St",
+  cityStateZip:"Superior, AZ 85173",
+  mapsUrl:"https://www.google.com/maps/search/?api=1&query=639+W+Hill+St+Superior+AZ+85173",
+  calendarTitle:TEMPLATES.service.calendarTitle,
+  calendarDescription:TEMPLATES.service.calendarDescription,
+  startDateTime:"2026-08-15T09:30",
+  endDateTime:"2026-08-15T14:30",
+  timezone:"America/Phoenix",
+  showImage:"yes",
+  theme:0
+};
+
+const fieldIds = [
+  "template","topLabel","title","hostLine","message","closing",
+  "dateDisplay","timeDisplay","venueName","streetAddress","cityStateZip","mapsUrl",
+  "calendarTitle","calendarDescription","startDateTime","endDateTime","timezone","showImage"
+];
+
+const fields = Object.fromEntries(fieldIds.map(id => [id,document.getElementById(id)]));
+const preview = document.getElementById("preview");
+const codePanel = document.getElementById("codePanel");
+const codeBox = document.getElementById("codeBox");
+const statusEl = document.getElementById("status");
+const toast = document.getElementById("toast");
+const toastTitle = document.getElementById("toastTitle");
+const toastMessage = document.getElementById("toastMessage");
+const hostingWarning = document.getElementById("hostingWarning");
+
+let currentTheme = 0;
+let toastTimer = null;
+
+function isHosted() {
+  return location.protocol === "https:" || location.protocol === "http:";
+}
+
+function imageUrl() {
+  return new URL("welcoming-chibis.webp", window.location.href).href.split("#")[0];
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;");
+}
+
+function readState() {
+  const state = {};
+  fieldIds.forEach(id => state[id] = fields[id].value);
+  state.theme = currentTheme;
+  return state;
+}
+
+function writeState(state) {
+  fieldIds.forEach(id => {
+    fields[id].value = state[id] ?? "";
+  });
+  currentTheme = Number(state.theme || 0);
+  applyTheme(currentTheme);
+}
+
+function formatCalendarDate(value) {
+  return String(value || "").replace(/[-:]/g,"");
+}
+
+function calendarUrl(state) {
+  const params = new URLSearchParams({
+    action:"TEMPLATE",
+    text:state.calendarTitle || state.title,
+    dates:`${formatCalendarDate(state.startDateTime)}/${formatCalendarDate(state.endDateTime)}`,
+    ctz:state.timezone || "America/Phoenix",
+    location:[state.venueName,state.streetAddress,state.cityStateZip].filter(Boolean).join(", "),
+    details:state.calendarDescription || state.message
+  });
+  return "https://calendar.google.com/calendar/render?" + params.toString();
+}
+
+function applyTheme(index) {
+  currentTheme = index;
+  const theme = THEMES[index] || THEMES[0];
+  const root = document.documentElement;
+  root.style.setProperty("--page-1",theme.vars.page1);
+  root.style.setProperty("--page-2",theme.vars.page2);
+  root.style.setProperty("--page-3",theme.vars.page3);
+  root.style.setProperty("--ink",theme.vars.ink);
+  root.style.setProperty("--muted",theme.vars.muted);
+  root.style.setProperty("--accent",theme.vars.accent);
+  root.style.setProperty("--accent-2",theme.vars.accent2);
+  root.style.setProperty("--soft",theme.vars.soft);
+  root.style.setProperty("--soft-2",theme.vars.soft2);
+  root.style.setProperty("--soft-3",theme.vars.soft3);
+  root.style.setProperty("--green",theme.vars.green);
+  root.style.setProperty("--gold",theme.vars.gold);
+
+  document.querySelectorAll(".theme-card").forEach((button,i) => {
+    button.classList.toggle("active",i === index);
+  });
+
+  render();
+}
+
+function buildThemeButtons() {
+  const grid = document.getElementById("themeGrid");
+  THEMES.forEach((theme,index) => {
+    const button = document.createElement("button");
+    button.className = "theme-card";
+    button.type = "button";
+    button.innerHTML = `
+      <div class="theme-dots">
+        <span style="background:${theme.vars.accent}"></span>
+        <span style="background:${theme.vars.page2}"></span>
+        <span style="background:${theme.vars.page3}"></span>
+      </div>
+      ${theme.name}
+    `;
+    button.addEventListener("click",() => applyTheme(index));
+    grid.appendChild(button);
+  });
+}
+
+function previewMarkup(state) {
+  const art = state.showImage === "yes" ? `
+    <div class="art-wrap">
+      <div class="art-blob"></div>
+      <span class="heart h1">♥</span>
+      <span class="heart h2">♥</span>
+      <div class="art-frame">
+        <img src="welcoming-chibis.webp" alt="Welcoming chibi couple">
+      </div>
+    </div>` : "";
+
+  return `
+    <div class="preview-stage">
+      <span class="float f1">🌸</span>
+      <span class="float f2">💗</span>
+      <span class="float f3">🌼</span>
+      <span class="float f4">✨</span>
+
+      <article class="preview-card">
+        <div class="preview-inner">
+          <div class="preview-actions">
+            <a class="calendar-preview" href="${escapeHtml(calendarUrl(state))}" target="_blank" rel="noopener">📅 Add to Calendar</a>
+          </div>
+
+          <section class="preview-hero">
+            <div>
+              <div class="preview-eyebrow">${escapeHtml(state.topLabel)}</div>
+              <h1 class="preview-title">${escapeHtml(state.title)}</h1>
+              <span class="with-line">with</span>
+              <span class="host-line">${escapeHtml(state.hostLine)}</span>
+              <p class="preview-message">${escapeHtml(state.message)}</p>
+
+              <div class="date-ribbon">
+                <span><strong>${escapeHtml(state.dateDisplay)}</strong></span>
+                <span>${escapeHtml(state.timeDisplay)}</span>
+              </div>
+            </div>
+            ${art}
+          </section>
+
+          <section class="preview-details">
+            <div class="preview-detail">
+              <div class="detail-icon">📅</div>
+              <div class="detail-label">Date</div>
+              <div class="detail-value">${escapeHtml(state.dateDisplay)}</div>
+            </div>
+
+            <div class="preview-detail">
+              <div class="detail-icon">🕤</div>
+              <div class="detail-label">Time</div>
+              <div class="detail-value">${escapeHtml(state.timeDisplay)}</div>
+            </div>
+
+            <div class="preview-detail">
+              <div class="detail-icon">📍</div>
+              <div class="detail-label">${escapeHtml(state.venueName || "Location")}</div>
+              <div class="detail-value">
+                <a href="${escapeHtml(state.mapsUrl || "#")}" target="_blank" rel="noopener">
+                  ${escapeHtml(state.streetAddress)}<br>
+                  ${escapeHtml(state.cityStateZip)}
+                </a>
+              </div>
+            </div>
+          </section>
+
+          <div class="closing-wrap">
+            <div class="closing">${escapeHtml(state.closing)}</div>
+          </div>
+        </div>
+      </article>
+    </div>`;
+}
+
+function embedCode(state) {
+  const theme = THEMES[state.theme] || THEMES[0];
+  const image = imageUrl();
+  const imageMarkup = state.showImage === "yes" ? `
+      <div class="sbi-art">
+        <div class="sbi-blob"></div>
+        <span class="sbi-heart sbi-h1">♥</span>
+        <span class="sbi-heart sbi-h2">♥</span>
+        <div class="sbi-art-frame">
+          <img src="${escapeHtml(image)}" alt="Welcoming chibi couple">
+        </div>
+      </div>` : "";
+
+  return `<!-- Small Batch Invite: paste this entire block into an HTML/custom-code section -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap');
+
+.sbi-invite,
+.sbi-invite * { box-sizing:border-box; }
+
+.sbi-invite {
+  --sbi-page1:${theme.vars.page1};
+  --sbi-page2:${theme.vars.page2};
+  --sbi-page3:${theme.vars.page3};
+  --sbi-ink:${theme.vars.ink};
+  --sbi-muted:${theme.vars.muted};
+  --sbi-accent:${theme.vars.accent};
+  --sbi-accent2:${theme.vars.accent2};
+  --sbi-soft:${theme.vars.soft};
+  --sbi-soft2:${theme.vars.soft2};
+  --sbi-soft3:${theme.vars.soft3};
+  --sbi-green:${theme.vars.green};
+  --sbi-gold:${theme.vars.gold};
+  width:100%;
+  padding:18px;
+  color:var(--sbi-ink);
+  background:
+    radial-gradient(circle at 8% 10%,rgba(255,255,255,.72) 0 82px,transparent 83px),
+    radial-gradient(circle at 90% 7%,rgba(255,255,255,.52) 0 70px,transparent 71px),
+    linear-gradient(145deg,var(--sbi-page1),var(--sbi-page2) 48%,var(--sbi-page3));
+  font-family:"DM Sans",system-ui,sans-serif;
+}
+
+.sbi-stage {
+  position:relative;
+  width:min(100%,980px);
+  margin:0 auto;
+}
+
+.sbi-float {
+  position:absolute;
+  z-index:0;
+  pointer-events:none;
+  user-select:none;
+  animation:sbi-floaty 5s ease-in-out infinite;
+  filter:drop-shadow(0 8px 15px rgba(94,62,77,.11));
+}
+
+.sbi-f1 { left:-4px;top:25px;font-size:2rem; }
+.sbi-f2 { right:0;top:80px;font-size:1.9rem;animation-delay:.7s; }
+.sbi-f3 { left:8px;bottom:32px;font-size:2rem;animation-delay:1.3s; }
+.sbi-f4 { right:12px;bottom:24px;font-size:1.85rem;animation-delay:1.7s; }
+
+@keyframes sbi-floaty {
+  0%,100% { transform:translateY(0); }
+  50% { transform:translateY(-10px); }
+}
+
+.sbi-card {
+  position:relative;
+  z-index:1;
+  overflow:hidden;
+  padding:14px;
+  border:2px solid rgba(255,255,255,.92);
+  border-radius:38px;
+  background:rgba(255,255,255,.84);
+  box-shadow:0 24px 68px rgba(91,57,72,.18);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+
+.sbi-inner {
+  position:relative;
+  z-index:1;
+  overflow:hidden;
+  border:2px solid rgba(213,166,83,.42);
+  border-radius:29px;
+  background:
+    linear-gradient(rgba(255,255,255,.83),rgba(255,255,255,.83)),
+    repeating-linear-gradient(45deg,rgba(230,154,182,.05) 0 14px,rgba(234,223,253,.06) 14px 28px);
+}
+
+.sbi-actions {
+  position:absolute;
+  z-index:5;
+  top:18px;
+  right:18px;
+}
+
+.sbi-calendar {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:44px;
+  padding:11px 16px;
+  border-radius:999px;
+  color:white !important;
+  background:linear-gradient(135deg,var(--sbi-accent),var(--sbi-accent2));
+  box-shadow:0 12px 24px rgba(97,64,80,.18);
+  text-decoration:none !important;
+  font-weight:800;
+}
+
+.sbi-hero {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(260px,.82fr);
+  align-items:center;
+  gap:8px;
+  min-height:525px;
+  padding:72px 38px 22px;
+}
+
+.sbi-eyebrow {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 16px;
+  border-radius:999px;
+  color:var(--sbi-accent);
+  background:rgba(255,255,255,.89);
+  box-shadow:0 8px 18px rgba(96,63,78,.06);
+  font-size:.79rem;
+  font-weight:800;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+
+.sbi-eyebrow::before,
+.sbi-eyebrow::after {
+  content:"✦";
+  color:var(--sbi-gold);
+  font-size:.75rem;
+}
+
+.sbi-title {
+  margin:22px 0 0 !important;
+  color:var(--sbi-accent) !important;
+  font-family:"Playfair Display",serif !important;
+  font-size:clamp(3.45rem,7.4vw,6.1rem) !important;
+  line-height:.9 !important;
+  letter-spacing:-.052em !important;
+}
+
+.sbi-with {
+  display:block;
+  margin:17px 0 4px;
+  color:var(--sbi-green);
+  font-size:1rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.sbi-host {
+  display:block;
+  max-width:520px;
+  font-family:"Playfair Display",serif;
+  font-size:clamp(1.85rem,4vw,2.95rem);
+  line-height:1.05;
+}
+
+.sbi-message {
+  max-width:570px;
+  margin:20px 0 22px !important;
+  color:var(--sbi-muted) !important;
+  font-size:1.07rem !important;
+  line-height:1.72 !important;
+}
+
+.sbi-ribbon {
+  display:inline-flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:9px 20px;
+  padding:15px 18px;
+  border-radius:22px;
+  background:linear-gradient(135deg,var(--sbi-soft),var(--sbi-soft2));
+  box-shadow:0 10px 22px rgba(96,63,78,.07);
+}
+
+.sbi-ribbon strong { color:var(--sbi-accent); }
+
+.sbi-art {
+  position:relative;
+  min-height:410px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+}
+
+.sbi-blob {
+  position:absolute;
+  right:3%;
+  bottom:6%;
+  width:92%;
+  aspect-ratio:1/1;
+  border:2px solid rgba(255,255,255,.88);
+  border-radius:47% 53% 58% 42% / 45% 44% 56% 55%;
+  background:radial-gradient(circle at 42% 36%,rgba(255,255,255,.95),rgba(255,244,249,.88) 42%,rgba(224,239,222,.82) 100%);
+  box-shadow:inset 0 0 0 8px rgba(255,255,255,.26),0 18px 36px rgba(107,71,87,.09);
+}
+
+.sbi-art-frame {
+  position:relative;
+  z-index:2;
+  width:min(100%,370px);
+  height:340px;
+  overflow:hidden;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+}
+
+.sbi-art-frame img {
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center top;
+  filter:drop-shadow(0 12px 18px rgba(68,46,55,.16));
+}
+
+.sbi-heart {
+  position:absolute;
+  z-index:3;
+  color:var(--sbi-accent);
+  animation:sbi-pulse 2.5s ease-in-out infinite;
+}
+
+.sbi-h1 { top:17%;right:5%;font-size:1.8rem; }
+.sbi-h2 { top:12%;left:12%;font-size:1.3rem;animation-delay:.8s; }
+
+@keyframes sbi-pulse {
+  0%,100% { transform:scale(1); }
+  50% { transform:scale(1.12); }
+}
+
+.sbi-details {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  padding:0 38px 27px;
+}
+
+.sbi-detail {
+  padding:18px 16px;
+  border:1px solid rgba(168,73,112,.13);
+  border-radius:24px;
+  background:rgba(255,255,255,.80);
+  box-shadow:0 10px 22px rgba(101,67,82,.06);
+}
+
+.sbi-detail-icon {
+  width:48px;
+  height:48px;
+  margin-bottom:10px;
+  display:grid;
+  place-items:center;
+  border-radius:16px;
+  background:linear-gradient(135deg,var(--sbi-soft),var(--sbi-soft2));
+  font-size:1.35rem;
+}
+
+.sbi-detail-label {
+  margin-bottom:7px;
+  color:var(--sbi-accent);
+  font-size:.73rem;
+  font-weight:900;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+
+.sbi-detail-value {
+  font-size:1rem;
+  font-weight:700;
+  line-height:1.55;
+}
+
+.sbi-detail-value a {
+  color:inherit !important;
+  text-decoration:none !important;
+  border-bottom:1px dashed rgba(168,73,112,.35);
+}
+
+.sbi-closing-wrap {
+  padding:0 38px 38px;
+  text-align:center;
+}
+
+.sbi-closing {
+  display:inline-block;
+  padding:16px 22px;
+  border-radius:22px;
+  color:var(--sbi-accent);
+  background:linear-gradient(135deg,var(--sbi-soft),var(--sbi-soft3));
+  font-weight:800;
+  line-height:1.55;
+}
+
+@media (max-width:760px) {
+  .sbi-invite { padding:10px; }
+  .sbi-card { padding:10px;border-radius:30px; }
+  .sbi-inner { border-radius:22px; }
+  .sbi-actions {
+    position:static;
+    display:flex;
+    justify-content:center;
+    padding:18px 18px 0;
+  }
+  .sbi-hero {
+    grid-template-columns:1fr;
+    min-height:auto;
+    padding:24px 20px 8px;
+    text-align:center;
+  }
+  .sbi-message {
+    margin-left:auto !important;
+    margin-right:auto !important;
+  }
+  .sbi-ribbon { justify-content:center; }
+  .sbi-art { min-height:auto;margin-top:8px; }
+  .sbi-blob {
+    right:50%;
+    width:min(94%,380px);
+    transform:translateX(50%);
+  }
+  .sbi-art-frame {
+    width:min(100%,330px);
+    height:300px;
+  }
+  .sbi-details {
+    grid-template-columns:1fr;
+    padding:6px 20px 24px;
+  }
+  .sbi-detail {
+    display:grid;
+    grid-template-columns:50px 1fr;
+    grid-template-areas:"icon label" "icon value";
+    column-gap:12px;
+    text-align:left;
+  }
+  .sbi-detail-icon { grid-area:icon;margin:0; }
+  .sbi-detail-label { grid-area:label;margin-top:3px; }
+  .sbi-detail-value { grid-area:value; }
+  .sbi-closing-wrap { padding:0 20px 28px; }
+}
+</style>
+
+<section class="sbi-invite" aria-label="${escapeHtml(state.title)} invitation">
+  <div class="sbi-stage">
+    <span class="sbi-float sbi-f1">🌸</span>
+    <span class="sbi-float sbi-f2">💗</span>
+    <span class="sbi-float sbi-f3">🌼</span>
+    <span class="sbi-float sbi-f4">✨</span>
+
+    <article class="sbi-card">
+      <div class="sbi-inner">
+        <div class="sbi-actions">
+          <a class="sbi-calendar" href="${escapeHtml(calendarUrl(state))}" target="_blank" rel="noopener">📅 Add to Calendar</a>
+        </div>
+
+        <div class="sbi-hero">
+          <div>
+            <div class="sbi-eyebrow">${escapeHtml(state.topLabel)}</div>
+            <h2 class="sbi-title">${escapeHtml(state.title)}</h2>
+            <span class="sbi-with">with</span>
+            <span class="sbi-host">${escapeHtml(state.hostLine)}</span>
+            <p class="sbi-message">${escapeHtml(state.message)}</p>
+
+            <div class="sbi-ribbon">
+              <span><strong>${escapeHtml(state.dateDisplay)}</strong></span>
+              <span>${escapeHtml(state.timeDisplay)}</span>
+            </div>
+          </div>
+          ${imageMarkup}
+        </div>
+
+        <div class="sbi-details">
+          <div class="sbi-detail">
+            <div class="sbi-detail-icon">📅</div>
+            <div class="sbi-detail-label">Date</div>
+            <div class="sbi-detail-value">${escapeHtml(state.dateDisplay)}</div>
+          </div>
+
+          <div class="sbi-detail">
+            <div class="sbi-detail-icon">🕤</div>
+            <div class="sbi-detail-label">Time</div>
+            <div class="sbi-detail-value">${escapeHtml(state.timeDisplay)}</div>
+          </div>
+
+          <div class="sbi-detail">
+            <div class="sbi-detail-icon">📍</div>
+            <div class="sbi-detail-label">${escapeHtml(state.venueName || "Location")}</div>
+            <div class="sbi-detail-value">
+              <a href="${escapeHtml(state.mapsUrl || "#")}" target="_blank" rel="noopener">
+                ${escapeHtml(state.streetAddress)}<br>
+                ${escapeHtml(state.cityStateZip)}
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="sbi-closing-wrap">
+          <div class="sbi-closing">${escapeHtml(state.closing)}</div>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+<!-- End Small Batch Invite -->`;
+}
+
+function render() {
+  const state = readState();
+  preview.innerHTML = previewMarkup(state);
+
+  if (codePanel.classList.contains("show")) {
+    codeBox.value = embedCode(state);
+  }
+
+  try {
+    localStorage.setItem("smallBatchInviteStudio.state",JSON.stringify(state));
+  } catch {}
+}
+
+function notify(type,title,message) {
+  clearTimeout(toastTimer);
+  toast.className = `toast ${type} show`;
+  toastTitle.textContent = title;
+  toastMessage.textContent = message;
+  statusEl.textContent = `${title}: ${message}`;
+
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  },5000);
+}
+
+function buttonFeedback(button,text) {
+  const original = button.textContent;
+  button.textContent = text;
+  button.classList.add("working");
+
+  setTimeout(() => {
+    button.textContent = original;
+    button.classList.remove("working");
+  },1700);
+}
+
+function showCode(selectAll=false) {
+  codeBox.value = embedCode(readState());
+  codePanel.classList.add("show");
+  codePanel.scrollIntoView({behavior:"smooth",block:"start"});
+
+  if (selectAll) {
+    setTimeout(() => {
+      codeBox.focus();
+      codeBox.select();
+      codeBox.setSelectionRange(0,codeBox.value.length);
+    },300);
+  }
+}
+
+async function copyEmbedCode() {
+  if (!isHosted()) {
+    showCode(false);
+    notify(
+      "error",
+      "Open the GitHub Pages version first",
+      "The local copy cannot create the public chibi image address. Upload both files, enable Pages, then copy from the live app."
+    );
+    return;
+  }
+
+  const code = embedCode(readState());
+
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(code);
+      notify("success","Embed code copied","Paste it into an HTML or custom-code section on your website.");
+      buttonFeedback(document.getElementById("copyBtn"),"Copied ✓");
+      return;
+    }
+  } catch (error) {
+    console.warn("Clipboard API failed:",error);
+  }
+
+  try {
+    codeBox.value = code;
+    codePanel.classList.add("show");
+    codeBox.focus();
+    codeBox.select();
+    codeBox.setSelectionRange(0,codeBox.value.length);
+
+    if (document.execCommand("copy")) {
+      notify("success","Embed code copied","The browser fallback copied the code.");
+      buttonFeedback(document.getElementById("copyBtn"),"Copied ✓");
+      return;
+    }
+  } catch (error) {
+    console.warn("Fallback copy failed:",error);
+  }
+
+  showCode(true);
+  notify(
+    "error",
+    "Automatic copy was blocked",
+    "The complete embed code is selected below. Press and hold inside the box, then choose Copy."
+  );
+}
+
+function downloadCode() {
+  if (!isHosted()) {
+    notify(
+      "error",
+      "Open the GitHub Pages version first",
+      "The live app is needed so the generated code contains the correct public image address."
+    );
+    return;
+  }
+
+  try {
+    const code = embedCode(readState());
+    const blob = new Blob([code],{type:"text/plain;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = (fields.title.value || "invite")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g,"-")
+      .replace(/^-|-$/g,"") + "-embed-code.txt";
+
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url),1200);
+
+    notify("success","Code download started","The text file contains the website-ready embed code.");
+    buttonFeedback(document.getElementById("downloadTxtBtn"),"Download started ✓");
+  } catch (error) {
+    console.error(error);
+    notify("error","Download failed","The browser could not create the code file.");
+  }
+}
+
+function resetApp() {
+  writeState(DEFAULTS);
+  render();
+  notify("info","Invite reset","The Service Plans defaults have been restored.");
+}
+
+function applyTemplate(name) {
+  const template = TEMPLATES[name];
+  if (!template) return;
+
+  fields.topLabel.value = template.topLabel;
+  fields.title.value = template.title;
+  fields.hostLine.value = template.hostLine;
+  fields.message.value = template.message;
+  fields.closing.value = template.closing;
+  fields.calendarTitle.value = template.calendarTitle;
+  fields.calendarDescription.value = template.calendarDescription;
+  render();
+}
+
+buildThemeButtons();
+
+let savedState = null;
+try {
+  savedState = JSON.parse(localStorage.getItem("smallBatchInviteStudio.state") || "null");
+} catch {}
+
+writeState({...DEFAULTS,...(savedState || {})});
+hostingWarning.classList.toggle("show",!isHosted());
+
+Object.values(fields).forEach(field => {
+  field.addEventListener("input",render);
+  field.addEventListener("change",render);
+});
+
+fields.template.addEventListener("change",event => applyTemplate(event.target.value));
+
+document.getElementById("copyBtn").addEventListener("click",copyEmbedCode);
+document.getElementById("showCodeBtn").addEventListener("click",() => {
+  showCode(false);
+  notify("info","Embed code shown","You can review it or select it manually.");
+});
+document.getElementById("downloadTxtBtn").addEventListener("click",downloadCode);
+document.getElementById("resetBtn").addEventListener("click",resetApp);
+
+document.getElementById("selectCodeBtn").addEventListener("click",() => {
+  showCode(true);
+  notify("info","Code selected","Press and hold inside the code box and choose Copy.");
+});
+
+document.getElementById("hideCodeBtn").addEventListener("click",() => {
+  codePanel.classList.remove("show");
+});
+
+render();
+</script>
+</body>
+</html>
