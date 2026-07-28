@@ -446,9 +446,13 @@
 
     .preview-actions {
       position:absolute;
-      z-index:5;
+      z-index:20;
       top:18px;
       right:18px;
+    }
+
+    .calendar-preview-wrap {
+      position:relative;
     }
 
     .calendar-preview {
@@ -458,12 +462,61 @@
       gap:8px;
       min-height:44px;
       padding:11px 16px;
+      border:0;
       border-radius:999px;
       color:white;
       background:linear-gradient(135deg,var(--accent),var(--accent-2));
       box-shadow:0 12px 24px rgba(97,64,80,.18);
       text-decoration:none;
       font-weight:800;
+      cursor:pointer;
+    }
+
+    .calendar-choice-menu {
+      position:absolute;
+      top:calc(100% + 9px);
+      right:0;
+      width:245px;
+      padding:9px;
+      border:1px solid rgba(111,77,93,.13);
+      border-radius:17px;
+      background:white;
+      box-shadow:0 18px 38px rgba(80,50,65,.18);
+      text-align:left;
+    }
+
+    .calendar-choice-menu[hidden] {
+      display:none;
+    }
+
+    .calendar-choice-menu button,
+    .calendar-choice-menu a {
+      display:block;
+      width:100%;
+      padding:12px;
+      border:0;
+      border-radius:12px;
+      color:var(--ink);
+      background:transparent;
+      font:inherit;
+      font-weight:800;
+      text-align:left;
+      text-decoration:none;
+      cursor:pointer;
+    }
+
+    .calendar-choice-menu button:hover,
+    .calendar-choice-menu a:hover {
+      background:#fff4f8;
+    }
+
+    .calendar-choice-menu small {
+      display:block;
+      margin-top:3px;
+      color:var(--muted);
+      font-size:.73rem;
+      font-weight:500;
+      line-height:1.35;
     }
 
     .preview-hero {
@@ -680,6 +733,12 @@
         display:flex;
         justify-content:center;
         padding:18px 18px 0;
+      }
+
+      .calendar-choice-menu {
+        left:50%;
+        right:auto;
+        transform:translateX(-50%);
       }
       .preview-hero {
         grid-template-columns:1fr;
@@ -1051,6 +1110,87 @@ function calendarUrl(state) {
   return "https://calendar.google.com/calendar/render?" + params.toString();
 }
 
+function escapeIcsText(value) {
+  return String(value || "")
+    .replace(/\\/g,"\\\\")
+    .replace(/\r?\n/g,"\\n")
+    .replace(/,/g,"\\,")
+    .replace(/;/g,"\\;");
+}
+
+function localIcsDate(value) {
+  return String(value || "").replace(/[-:]/g,"");
+}
+
+function buildIcs(state) {
+  const location = [state.venueName,state.streetAddress,state.cityStateZip]
+    .filter(Boolean)
+    .join(", ");
+
+  const stamp = new Date().toISOString()
+    .replace(/[-:]/g,"")
+    .replace(/\.\d{3}Z$/,"Z");
+
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Small Batch Invite Studio//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    "BEGIN:VEVENT",
+    `UID:${Date.now()}-${Math.random().toString(36).slice(2)}@small-batch-invite`,
+    `DTSTAMP:${stamp}`,
+    `DTSTART;TZID=${state.timezone || "America/Phoenix"}:${localIcsDate(state.startDateTime)}`,
+    `DTEND;TZID=${state.timezone || "America/Phoenix"}:${localIcsDate(state.endDateTime)}`,
+    `SUMMARY:${escapeIcsText(state.calendarTitle || state.title)}`,
+    `DESCRIPTION:${escapeIcsText(state.calendarDescription || state.message)}`,
+    `LOCATION:${escapeIcsText(location)}`,
+    "END:VEVENT",
+    "END:VCALENDAR"
+  ].join("\r\n");
+}
+
+function safeCalendarFileName(state) {
+  return (state.calendarTitle || state.title || "event")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g,"-")
+    .replace(/^-|-$/g,"") + ".ics";
+}
+
+function openDeviceCalendar(state) {
+  const ics = buildIcs(state);
+  const isiPhoneOrIPad =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  try {
+    if (isiPhoneOrIPad) {
+      // iOS handles an iCalendar document through the device's calendar/file handler.
+      window.location.href =
+        "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
+      return;
+    }
+
+    const blob = new Blob([ics],{type:"text/calendar;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = safeCalendarFileName(state);
+    anchor.style.display = "none";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url),1500);
+  } catch (error) {
+    console.error(error);
+    notify(
+      "error",
+      "Calendar file could not open",
+      "Choose Google Calendar instead, or try again in Safari or Chrome."
+    );
+  }
+}
+
 function applyTheme(index) {
   currentTheme = index;
   const theme = THEMES[index] || THEMES[0];
@@ -1115,7 +1255,23 @@ function previewMarkup(state) {
       <article class="preview-card">
         <div class="preview-inner">
           <div class="preview-actions">
-            <a class="calendar-preview" href="${escapeHtml(calendarUrl(state))}" target="_blank" rel="noopener">📅 Add to Calendar</a>
+            <div class="calendar-preview-wrap">
+              <button class="calendar-preview" type="button" data-preview-calendar-toggle>
+                📅 Add to Calendar
+              </button>
+
+              <div class="calendar-choice-menu" data-preview-calendar-menu hidden>
+                <button type="button" data-preview-device-calendar>
+                  Apple / Phone Calendar
+                  <small>Opens or downloads a standard calendar event.</small>
+                </button>
+
+                <a href="${escapeHtml(calendarUrl(state))}" data-preview-google-calendar>
+                  Google Calendar
+                  <small>May open the Google Calendar app when installed.</small>
+                </a>
+              </div>
+            </div>
           </div>
 
           <section class="preview-hero">
@@ -1261,9 +1417,13 @@ function embedCode(state) {
 
 .sbi-actions {
   position:absolute;
-  z-index:5;
+  z-index:20;
   top:18px;
   right:18px;
+}
+
+.sbi-calendar-wrap {
+  position:relative;
 }
 
 .sbi-calendar {
@@ -1273,12 +1433,62 @@ function embedCode(state) {
   gap:8px;
   min-height:44px;
   padding:11px 16px;
+  border:0;
   border-radius:999px;
   color:white !important;
   background:linear-gradient(135deg,var(--sbi-accent),var(--sbi-accent2));
   box-shadow:0 12px 24px rgba(97,64,80,.18);
   text-decoration:none !important;
+  font:inherit;
   font-weight:800;
+  cursor:pointer;
+}
+
+.sbi-calendar-menu {
+  position:absolute;
+  top:calc(100% + 9px);
+  right:0;
+  width:245px;
+  padding:9px;
+  border:1px solid rgba(111,77,93,.13);
+  border-radius:17px;
+  background:white;
+  box-shadow:0 18px 38px rgba(80,50,65,.18);
+  text-align:left;
+}
+
+.sbi-calendar-menu[hidden] {
+  display:none;
+}
+
+.sbi-calendar-menu button,
+.sbi-calendar-menu a {
+  display:block;
+  width:100%;
+  padding:12px;
+  border:0;
+  border-radius:12px;
+  color:var(--sbi-ink) !important;
+  background:transparent;
+  font:inherit;
+  font-weight:800;
+  text-align:left;
+  text-decoration:none !important;
+  cursor:pointer;
+}
+
+.sbi-calendar-menu button:hover,
+.sbi-calendar-menu a:hover {
+  background:#fff4f8;
+}
+
+.sbi-calendar-menu small {
+  display:block;
+  margin-top:3px;
+  color:var(--sbi-muted);
+  font-size:.73rem;
+  font-weight:500;
+  line-height:1.35;
 }
 
 .sbi-hero {
@@ -1486,6 +1696,12 @@ function embedCode(state) {
     justify-content:center;
     padding:18px 18px 0;
   }
+
+  .sbi-calendar-menu {
+    left:50%;
+    right:auto;
+    transform:translateX(-50%);
+  }
   .sbi-hero {
     grid-template-columns:1fr;
     min-height:auto;
@@ -1535,7 +1751,23 @@ function embedCode(state) {
     <article class="sbi-card">
       <div class="sbi-inner">
         <div class="sbi-actions">
-          <a class="sbi-calendar" href="${escapeHtml(calendarUrl(state))}" target="_blank" rel="noopener">📅 Add to Calendar</a>
+          <div class="sbi-calendar-wrap">
+            <button class="sbi-calendar" type="button" data-sbi-calendar-toggle>
+              📅 Add to Calendar
+            </button>
+
+            <div class="sbi-calendar-menu" data-sbi-calendar-menu hidden>
+              <button type="button" data-sbi-device-calendar>
+                Apple / Phone Calendar
+                <small>Opens or downloads a standard calendar event.</small>
+              </button>
+
+              <a href="${escapeHtml(calendarUrl(state))}" data-sbi-google-calendar>
+                Google Calendar
+                <small>May open the Google Calendar app when installed.</small>
+              </a>
+            </div>
+          </div>
         </div>
 
         <div class="sbi-hero">
@@ -1586,6 +1818,109 @@ function embedCode(state) {
     </article>
   </div>
 </section>
+
+<script>
+(() => {
+  const script = document.currentScript;
+  const root = script.previousElementSibling;
+  const toggle = root.querySelector("[data-sbi-calendar-toggle]");
+  const menu = root.querySelector("[data-sbi-calendar-menu]");
+  const deviceButton = root.querySelector("[data-sbi-device-calendar]");
+
+  const eventData = {
+    title: ${JSON.stringify(state.calendarTitle || state.title)},
+    description: ${JSON.stringify(state.calendarDescription || state.message)},
+    venue: ${JSON.stringify(state.venueName)},
+    street: ${JSON.stringify(state.streetAddress)},
+    city: ${JSON.stringify(state.cityStateZip)},
+    start: ${JSON.stringify(state.startDateTime)},
+    end: ${JSON.stringify(state.endDateTime)},
+    timezone: ${JSON.stringify(state.timezone || 'America/Phoenix')}
+  };
+
+  const escapeIcs = value => String(value || "")
+    .replace(/\\/g,"\\\\")
+    .replace(/\r?\n/g,"\\n")
+    .replace(/,/g,"\\,")
+    .replace(/;/g,"\\;");
+
+  const localDate = value => String(value || "").replace(/[-:]/g,"");
+
+  const buildIcs = () => {
+    const location = [eventData.venue,eventData.street,eventData.city]
+      .filter(Boolean)
+      .join(", ");
+
+    const stamp = new Date().toISOString()
+      .replace(/[-:]/g,"")
+      .replace(/\.\d{3}Z$/,"Z");
+
+    return [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Small Batch Invite//EN",
+      "CALSCALE:GREGORIAN",
+      "METHOD:PUBLISH",
+      "BEGIN:VEVENT",
+      `UID:${Date.now()}-${Math.random().toString(36).slice(2)}@small-batch-invite`,
+      `DTSTAMP:${stamp}`,
+      `DTSTART;TZID=${eventData.timezone}:${localDate(eventData.start)}`,
+      `DTEND;TZID=${eventData.timezone}:${localDate(eventData.end)}`,
+      `SUMMARY:${escapeIcs(eventData.title)}`,
+      `DESCRIPTION:${escapeIcs(eventData.description)}`,
+      `LOCATION:${escapeIcs(location)}`,
+      "END:VEVENT",
+      "END:VCALENDAR"
+    ].join("\r\n");
+  };
+
+  const fileName = () =>
+    (eventData.title || "event")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g,"-")
+      .replace(/^-|-$/g,"") + ".ics";
+
+  const openDeviceCalendar = () => {
+    const ics = buildIcs();
+    const isiPhoneOrIPad =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    if (isiPhoneOrIPad) {
+      window.location.href =
+        "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
+      return;
+    }
+
+    const blob = new Blob([ics],{type:"text/calendar;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = fileName();
+    anchor.style.display = "none";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url),1500);
+  };
+
+  toggle.addEventListener("click",event => {
+    event.stopPropagation();
+    menu.hidden = !menu.hidden;
+  });
+
+  deviceButton.addEventListener("click",() => {
+    menu.hidden = true;
+    openDeviceCalendar();
+  });
+
+  document.addEventListener("click",event => {
+    if (!menu.contains(event.target) && event.target !== toggle) {
+      menu.hidden = true;
+    }
+  });
+})();
+</script>
 <!-- End Small Batch Invite -->`;
 }
 
@@ -1593,6 +1928,28 @@ function render() {
   const state = readState();
   preview.innerHTML = previewMarkup(state);
   updateImageStatus();
+
+  const previewToggle = preview.querySelector("[data-preview-calendar-toggle]");
+  const previewMenu = preview.querySelector("[data-preview-calendar-menu]");
+  const previewDevice = preview.querySelector("[data-preview-device-calendar]");
+
+  if (previewToggle && previewMenu) {
+    previewToggle.addEventListener("click",event => {
+      event.stopPropagation();
+      previewMenu.hidden = !previewMenu.hidden;
+    });
+
+    previewDevice?.addEventListener("click",() => {
+      previewMenu.hidden = true;
+      openDeviceCalendar(state);
+    });
+
+    document.addEventListener("click",event => {
+      if (!previewMenu.contains(event.target) && event.target !== previewToggle) {
+        previewMenu.hidden = true;
+      }
+    },{once:true});
+  }
 
   if (codePanel.classList.contains("show")) {
     codeBox.value = embedCode(state);
