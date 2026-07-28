@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8dce7">
+  <meta name="app-build" content="script-runtime-fix-2">
   <title>Small Batch Invite Studio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1323,6 +1324,123 @@ function previewMarkup(state) {
     </div>`;
 }
 
+
+function sbiCalendarRuntime(eventData) {
+  const script = document.currentScript;
+  const root = script ? script.previousElementSibling : null;
+  if (!root) return;
+
+  const toggle = root.querySelector("[data-sbi-calendar-toggle]");
+  const menu = root.querySelector("[data-sbi-calendar-menu]");
+  const deviceButton = root.querySelector("[data-sbi-device-calendar]");
+
+  if (!toggle || !menu || !deviceButton) return;
+
+  const escapeIcs = value => String(value || "")
+    .replace(/\\/g,"\\\\")
+    .replace(/\r?\n/g,"\\n")
+    .replace(/,/g,"\\,")
+    .replace(/;/g,"\\;");
+
+  const localDate = value => String(value || "").replace(/[-:]/g,"");
+
+  const buildIcs = () => {
+    const location = [eventData.venue,eventData.street,eventData.city]
+      .filter(Boolean)
+      .join(", ");
+
+    const stamp = new Date().toISOString()
+      .replace(/[-:]/g,"")
+      .replace(/\.\d{3}Z$/,"Z");
+
+    return [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Small Batch Invite//EN",
+      "CALSCALE:GREGORIAN",
+      "METHOD:PUBLISH",
+      "BEGIN:VEVENT",
+      "UID:" + Date.now() + "-" + Math.random().toString(36).slice(2) + "@small-batch-invite",
+      "DTSTAMP:" + stamp,
+      "DTSTART;TZID=" + eventData.timezone + ":" + localDate(eventData.start),
+      "DTEND;TZID=" + eventData.timezone + ":" + localDate(eventData.end),
+      "SUMMARY:" + escapeIcs(eventData.title),
+      "DESCRIPTION:" + escapeIcs(eventData.description),
+      "LOCATION:" + escapeIcs(location),
+      "END:VEVENT",
+      "END:VCALENDAR"
+    ].join("\r\n");
+  };
+
+  const fileName = () =>
+    (eventData.title || "event")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g,"-")
+      .replace(/^-|-$/g,"") + ".ics";
+
+  const openDeviceCalendar = () => {
+    const ics = buildIcs();
+    const isiPhoneOrIPad =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    if (isiPhoneOrIPad) {
+      window.location.href =
+        "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
+      return;
+    }
+
+    const blob = new Blob([ics],{type:"text/calendar;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = fileName();
+    anchor.style.display = "none";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url),1500);
+  };
+
+  toggle.addEventListener("click",event => {
+    event.stopPropagation();
+    menu.hidden = !menu.hidden;
+  });
+
+  deviceButton.addEventListener("click",() => {
+    menu.hidden = true;
+    openDeviceCalendar();
+  });
+
+  document.addEventListener("click",event => {
+    if (!menu.contains(event.target) && event.target !== toggle) {
+      menu.hidden = true;
+    }
+  });
+}
+
+function calendarEmbedScript(state) {
+  const eventData = {
+    title: state.calendarTitle || state.title,
+    description: state.calendarDescription || state.message,
+    venue: state.venueName,
+    street: state.streetAddress,
+    city: state.cityStateZip,
+    start: state.startDateTime,
+    end: state.endDateTime,
+    timezone: state.timezone || "America/Phoenix"
+  };
+
+  // Splitting the closing tag prevents the browser from ending this app's
+  // main script while parsing the source file.
+  return "<script>(" +
+    sbiCalendarRuntime.toString() +
+    ")(" +
+    JSON.stringify(eventData) +
+    ");</scr" +
+    "ipt>";
+}
+
 function embedCode(state) {
   const theme = THEMES[state.theme] || THEMES[0];
   const image = currentImageUrl();
@@ -1819,108 +1937,8 @@ function embedCode(state) {
   </div>
 </section>
 
-<script>
-(() => {
-  const script = document.currentScript;
-  const root = script.previousElementSibling;
-  const toggle = root.querySelector("[data-sbi-calendar-toggle]");
-  const menu = root.querySelector("[data-sbi-calendar-menu]");
-  const deviceButton = root.querySelector("[data-sbi-device-calendar]");
 
-  const eventData = {
-    title: ${JSON.stringify(state.calendarTitle || state.title)},
-    description: ${JSON.stringify(state.calendarDescription || state.message)},
-    venue: ${JSON.stringify(state.venueName)},
-    street: ${JSON.stringify(state.streetAddress)},
-    city: ${JSON.stringify(state.cityStateZip)},
-    start: ${JSON.stringify(state.startDateTime)},
-    end: ${JSON.stringify(state.endDateTime)},
-    timezone: ${JSON.stringify(state.timezone || 'America/Phoenix')}
-  };
-
-  const escapeIcs = value => String(value || "")
-    .replace(/\\/g,"\\\\")
-    .replace(/\r?\n/g,"\\n")
-    .replace(/,/g,"\\,")
-    .replace(/;/g,"\\;");
-
-  const localDate = value => String(value || "").replace(/[-:]/g,"");
-
-  const buildIcs = () => {
-    const location = [eventData.venue,eventData.street,eventData.city]
-      .filter(Boolean)
-      .join(", ");
-
-    const stamp = new Date().toISOString()
-      .replace(/[-:]/g,"")
-      .replace(/\.\d{3}Z$/,"Z");
-
-    return [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "PRODID:-//Small Batch Invite//EN",
-      "CALSCALE:GREGORIAN",
-      "METHOD:PUBLISH",
-      "BEGIN:VEVENT",
-      `UID:${Date.now()}-${Math.random().toString(36).slice(2)}@small-batch-invite`,
-      `DTSTAMP:${stamp}`,
-      `DTSTART;TZID=${eventData.timezone}:${localDate(eventData.start)}`,
-      `DTEND;TZID=${eventData.timezone}:${localDate(eventData.end)}`,
-      `SUMMARY:${escapeIcs(eventData.title)}`,
-      `DESCRIPTION:${escapeIcs(eventData.description)}`,
-      `LOCATION:${escapeIcs(location)}`,
-      "END:VEVENT",
-      "END:VCALENDAR"
-    ].join("\r\n");
-  };
-
-  const fileName = () =>
-    (eventData.title || "event")
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g,"-")
-      .replace(/^-|-$/g,"") + ".ics";
-
-  const openDeviceCalendar = () => {
-    const ics = buildIcs();
-    const isiPhoneOrIPad =
-      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
-    if (isiPhoneOrIPad) {
-      window.location.href =
-        "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
-      return;
-    }
-
-    const blob = new Blob([ics],{type:"text/calendar;charset=utf-8"});
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = fileName();
-    anchor.style.display = "none";
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    setTimeout(() => URL.revokeObjectURL(url),1500);
-  };
-
-  toggle.addEventListener("click",event => {
-    event.stopPropagation();
-    menu.hidden = !menu.hidden;
-  });
-
-  deviceButton.addEventListener("click",() => {
-    menu.hidden = true;
-    openDeviceCalendar();
-  });
-
-  document.addEventListener("click",event => {
-    if (!menu.contains(event.target) && event.target !== toggle) {
-      menu.hidden = true;
-    }
-  });
-})();
-</script>
+${calendarEmbedScript(state)}
 <!-- End Small Batch Invite -->`;
 }
 
