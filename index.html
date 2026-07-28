@@ -241,6 +241,39 @@
       font-weight:800;
     }
 
+    .image-upload-box {
+      margin-top:10px;
+      padding:11px;
+      border-radius:15px;
+      background:#fff7fb;
+      border:1px solid rgba(168,73,112,.10);
+    }
+
+    .image-upload-box input[type="file"] {
+      width:100%;
+      margin-top:7px;
+      font-size:.82rem;
+    }
+
+    .image-upload-actions {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .image-status {
+      margin-top:9px;
+      color:var(--muted);
+      font-size:.78rem;
+      line-height:1.45;
+      overflow-wrap:anywhere;
+    }
+
+    .image-status strong {
+      color:var(--accent);
+    }
+
     .code-panel {
       display:none;
       margin-top:12px;
@@ -636,7 +669,7 @@
     }
 
     @media (max-width:520px) {
-      .toolbar,.two,.code-actions { grid-template-columns:1fr; }
+      .toolbar,.two,.code-actions,.image-upload-actions { grid-template-columns:1fr; }
     }
   </style>
 </head>
@@ -654,7 +687,7 @@
       </p>
 
       <div id="hostingWarning" class="hosting-warning">
-        This copy is opened from your device. Upload both GitHub files and open the GitHub Pages app before copying the final embed code, so the chibi image has a public web address.
+        This copy is opened from your device. You can upload your own chibis and embed them directly. The built-in chibis require the GitHub Pages version so their image address is public.
       </div>
 
       <div class="toolbar">
@@ -717,14 +750,30 @@
       </section>
 
       <section class="section">
-        <h2>Image</h2>
+        <h2>Chibi Image</h2>
         <label>
           Display
           <select id="showImage">
-            <option value="yes">Show welcoming chibis</option>
+            <option value="yes">Show chibis</option>
             <option value="no">No image</option>
           </select>
         </label>
+
+        <div class="image-upload-box">
+          <label>
+            Upload my chibis
+            <input id="imageUpload" type="file" accept="image/png,image/webp,image/jpeg">
+          </label>
+
+          <div class="image-upload-actions">
+            <button id="useBuiltInBtn" class="btn secondary" type="button">Use Built-In</button>
+            <button id="hideImageBtn" class="btn secondary" type="button">Hide Image</button>
+          </div>
+
+          <div id="imageStatus" class="image-status">
+            Using the built-in welcoming chibis.
+          </div>
+        </div>
       </section>
 
       <section class="section">
@@ -866,16 +915,44 @@ const toast = document.getElementById("toast");
 const toastTitle = document.getElementById("toastTitle");
 const toastMessage = document.getElementById("toastMessage");
 const hostingWarning = document.getElementById("hostingWarning");
+const imageUpload = document.getElementById("imageUpload");
+const imageStatus = document.getElementById("imageStatus");
 
 let currentTheme = 0;
 let toastTimer = null;
+let uploadedImageData = "";
+let uploadedImageName = "";
 
 function isHosted() {
   return location.protocol === "https:" || location.protocol === "http:";
 }
 
-function imageUrl() {
+function builtInImageUrl() {
   return new URL("welcoming-chibis.webp", window.location.href).href.split("#")[0];
+}
+
+function currentImageUrl() {
+  if (uploadedImageData) return uploadedImageData;
+  return isHosted() ? builtInImageUrl() : "welcoming-chibis.webp";
+}
+
+function updateImageStatus() {
+  if (fields.showImage.value === "no") {
+    imageStatus.innerHTML = "<strong>Image hidden.</strong> It will not be included in the embed code.";
+    return;
+  }
+
+  if (uploadedImageData) {
+    imageStatus.innerHTML =
+      "<strong>Using your uploaded chibis.</strong><br>" +
+      escapeHtml(uploadedImageName || "Uploaded image") +
+      " will be embedded directly into the copied code.";
+    return;
+  }
+
+  imageStatus.innerHTML =
+    "<strong>Using the built-in welcoming chibis.</strong>" +
+    (isHosted() ? "" : "<br>Open the GitHub Pages version before copying this option.");
 }
 
 function escapeHtml(value) {
@@ -967,7 +1044,7 @@ function previewMarkup(state) {
       <span class="heart h1">♥</span>
       <span class="heart h2">♥</span>
       <div class="art-frame">
-        <img src="welcoming-chibis.webp" alt="Welcoming chibi couple">
+        <img src="${escapeHtml(currentImageUrl())}" alt="Welcoming chibi couple">
       </div>
     </div>` : "";
 
@@ -1035,7 +1112,7 @@ function previewMarkup(state) {
 
 function embedCode(state) {
   const theme = THEMES[state.theme] || THEMES[0];
-  const image = imageUrl();
+  const image = currentImageUrl();
   const imageMarkup = state.showImage === "yes" ? `
       <div class="sbi-art">
         <div class="sbi-blob"></div>
@@ -1458,6 +1535,7 @@ function embedCode(state) {
 function render() {
   const state = readState();
   preview.innerHTML = previewMarkup(state);
+  updateImageStatus();
 
   if (codePanel.classList.contains("show")) {
     codeBox.value = embedCode(state);
@@ -1506,17 +1584,19 @@ function showCode(selectAll=false) {
 }
 
 async function copyEmbedCode() {
-  if (!isHosted()) {
+  const state = readState();
+
+  if (!isHosted() && state.showImage === "yes" && !uploadedImageData) {
     showCode(false);
     notify(
       "error",
-      "Open the GitHub Pages version first",
-      "The local copy cannot create the public chibi image address. Upload both files, enable Pages, then copy from the live app."
+      "Upload your chibis or open GitHub Pages",
+      "The built-in image needs a public GitHub address. Upload your own image here, or copy from the live GitHub Pages app."
     );
     return;
   }
 
-  const code = embedCode(readState());
+  const code = embedCode(state);
 
   try {
     if (navigator.clipboard && window.isSecureContext) {
@@ -1554,17 +1634,19 @@ async function copyEmbedCode() {
 }
 
 function downloadCode() {
-  if (!isHosted()) {
+  const state = readState();
+
+  if (!isHosted() && state.showImage === "yes" && !uploadedImageData) {
     notify(
       "error",
-      "Open the GitHub Pages version first",
-      "The live app is needed so the generated code contains the correct public image address."
+      "Upload your chibis or open GitHub Pages",
+      "The built-in image needs a public GitHub address. Upload your own image here, or download from the live GitHub Pages app."
     );
     return;
   }
 
   try {
-    const code = embedCode(readState());
+    const code = embedCode(state);
     const blob = new Blob([code],{type:"text/plain;charset=utf-8"});
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
@@ -1587,10 +1669,126 @@ function downloadCode() {
   }
 }
 
+function readFileAsDataUrl(file) {
+  return new Promise((resolve,reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error || new Error("The image could not be read."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImage(dataUrl) {
+  return new Promise((resolve,reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("The selected image could not be opened."));
+    image.src = dataUrl;
+  });
+}
+
+async function optimizeUploadedImage(file) {
+  if (!file || !file.type.startsWith("image/")) {
+    throw new Error("Please choose a PNG, WebP, or JPG image.");
+  }
+
+  const originalData = await readFileAsDataUrl(file);
+  const image = await loadImage(originalData);
+
+  const maxDimension = 1600;
+  const scale = Math.min(1,maxDimension / Math.max(image.naturalWidth,image.naturalHeight));
+  const width = Math.max(1,Math.round(image.naturalWidth * scale));
+  const height = Math.max(1,Math.round(image.naturalHeight * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const context = canvas.getContext("2d");
+  context.clearRect(0,0,width,height);
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.drawImage(image,0,0,width,height);
+
+  // WebP keeps transparency while making the pasted embed code much smaller.
+  let optimized = canvas.toDataURL("image/webp",0.9);
+
+  if (!optimized.startsWith("data:image/webp")) {
+    optimized = canvas.toDataURL("image/png");
+  }
+
+  return optimized;
+}
+
+async function handleImageUpload(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  const uploadButtonText = "Processing image…";
+  imageStatus.innerHTML = `<strong>${uploadButtonText}</strong>`;
+
+  try {
+    uploadedImageData = await optimizeUploadedImage(file);
+    uploadedImageName = file.name;
+    fields.showImage.value = "yes";
+
+    try {
+      localStorage.setItem("smallBatchInviteStudio.uploadedImage",uploadedImageData);
+      localStorage.setItem("smallBatchInviteStudio.uploadedImageName",uploadedImageName);
+    } catch {
+      // The image still works for the current session if browser storage is full.
+    }
+
+    render();
+    notify(
+      "success",
+      "Chibis uploaded",
+      "Your image is now in the preview and will be embedded directly into the website code."
+    );
+  } catch (error) {
+    console.error(error);
+    uploadedImageData = "";
+    uploadedImageName = "";
+    imageUpload.value = "";
+    render();
+    notify("error","Image upload failed",error.message || "The image could not be processed.");
+  }
+}
+
+function useBuiltInImage() {
+  uploadedImageData = "";
+  uploadedImageName = "";
+  imageUpload.value = "";
+  fields.showImage.value = "yes";
+
+  try {
+    localStorage.removeItem("smallBatchInviteStudio.uploadedImage");
+    localStorage.removeItem("smallBatchInviteStudio.uploadedImageName");
+  } catch {}
+
+  render();
+  notify("info","Built-in chibis selected","The app is using welcoming-chibis.webp again.");
+}
+
+function hideInviteImage() {
+  fields.showImage.value = "no";
+  render();
+  notify("info","Image hidden","No chibi image will appear in the invitation code.");
+}
+
 function resetApp() {
+  uploadedImageData = "";
+  uploadedImageName = "";
+  imageUpload.value = "";
+
+  try {
+    localStorage.removeItem("smallBatchInviteStudio.uploadedImage");
+    localStorage.removeItem("smallBatchInviteStudio.uploadedImageName");
+  } catch {}
+
   writeState(DEFAULTS);
   render();
-  notify("info","Invite reset","The Service Plans defaults have been restored.");
+  notify("info","Invite reset","The Service Plans defaults and built-in chibis have been restored.");
 }
 
 function applyTemplate(name) {
@@ -1612,6 +1810,8 @@ buildThemeButtons();
 let savedState = null;
 try {
   savedState = JSON.parse(localStorage.getItem("smallBatchInviteStudio.state") || "null");
+  uploadedImageData = localStorage.getItem("smallBatchInviteStudio.uploadedImage") || "";
+  uploadedImageName = localStorage.getItem("smallBatchInviteStudio.uploadedImageName") || "";
 } catch {}
 
 writeState({...DEFAULTS,...(savedState || {})});
@@ -1631,6 +1831,9 @@ document.getElementById("showCodeBtn").addEventListener("click",() => {
 });
 document.getElementById("downloadTxtBtn").addEventListener("click",downloadCode);
 document.getElementById("resetBtn").addEventListener("click",resetApp);
+imageUpload.addEventListener("change",handleImageUpload);
+document.getElementById("useBuiltInBtn").addEventListener("click",useBuiltInImage);
+document.getElementById("hideImageBtn").addEventListener("click",hideInviteImage);
 
 document.getElementById("selectCodeBtn").addEventListener("click",() => {
   showCode(true);
