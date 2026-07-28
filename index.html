@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8dce7">
-  <meta name="app-build" content="calendar-download-confirmation-4">
+  <meta name="app-build" content="calendar-time-seconds-fix-5">
   <title>Small Batch Invite Studio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1183,7 +1183,9 @@ function writeState(state) {
 }
 
 function formatCalendarDate(value) {
-  return String(value || "").replace(/[-:]/g,"");
+  const compact = String(value || "").replace(/[-:]/g,"");
+  if (!compact) return "";
+  return compact.length === 13 ? compact + "00" : compact;
 }
 
 function calendarUrl(state) {
@@ -1207,7 +1209,9 @@ function escapeIcsText(value) {
 }
 
 function localIcsDate(value) {
-  return String(value || "").replace(/[-:]/g,"");
+  const compact = String(value || "").replace(/[-:]/g,"");
+  if (!compact) return "";
+  return compact.length === 13 ? compact + "00" : compact;
 }
 
 function buildIcs(state) {
@@ -1443,7 +1447,11 @@ function sbiCalendarRuntime(eventData) {
     .replace(/,/g,"\\,")
     .replace(/;/g,"\\;");
 
-  const localDate = value => String(value || "").replace(/[-:]/g,"");
+  const localDate = value => {
+    const compact = String(value || "").replace(/[-:]/g,"");
+    if (!compact) return "";
+    return compact.length === 13 ? compact + "00" : compact;
+  };
 
   const buildIcs = () => {
     const location = [eventData.venue,eventData.street,eventData.city]
