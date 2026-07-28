@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8dce7">
-  <meta name="app-build" content="script-runtime-fix-2">
+  <meta name="app-build" content="calendar-download-confirmation-4">
   <title>Small Batch Invite Studio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -393,6 +393,77 @@
     .toast span {
       font-size:.86rem;
       line-height:1.4;
+    }
+
+    .calendar-download-overlay {
+      position:fixed;
+      inset:0;
+      z-index:10000;
+      display:grid;
+      place-items:center;
+      padding:20px;
+      background:rgba(44,31,39,.45);
+      backdrop-filter:blur(5px);
+      -webkit-backdrop-filter:blur(5px);
+    }
+
+    .calendar-download-overlay[hidden] {
+      display:none;
+    }
+
+    .calendar-download-card {
+      width:min(100%,430px);
+      padding:24px;
+      border-radius:24px;
+      background:white;
+      box-shadow:0 28px 70px rgba(44,31,39,.28);
+      text-align:center;
+    }
+
+    .calendar-download-icon {
+      width:62px;
+      height:62px;
+      margin:0 auto 14px;
+      display:grid;
+      place-items:center;
+      border-radius:20px;
+      background:linear-gradient(135deg,var(--soft),var(--soft-2));
+      font-size:1.8rem;
+    }
+
+    .calendar-download-card h3 {
+      margin:0 0 10px;
+      color:var(--accent);
+      font-family:"Playfair Display",serif;
+      font-size:1.45rem;
+    }
+
+    .calendar-download-card p {
+      margin:0;
+      color:var(--muted);
+      line-height:1.58;
+    }
+
+    .calendar-download-card .download-file-name {
+      display:block;
+      margin-top:10px;
+      color:var(--ink);
+      font-size:.83rem;
+      font-weight:800;
+      overflow-wrap:anywhere;
+    }
+
+    .calendar-download-card button {
+      width:100%;
+      margin-top:18px;
+      border:0;
+      border-radius:999px;
+      padding:12px 16px;
+      color:white;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      font:inherit;
+      font-weight:800;
+      cursor:pointer;
     }
 
     /* Preview invite */
@@ -920,6 +991,19 @@
     <span id="toastMessage"></span>
   </div>
 
+  <div id="calendarDownloadOverlay" class="calendar-download-overlay" hidden>
+    <div class="calendar-download-card" role="dialog" aria-modal="true" aria-labelledby="calendarDownloadTitle">
+      <div class="calendar-download-icon">📅</div>
+      <h3 id="calendarDownloadTitle">Calendar Event Downloaded</h3>
+      <p>
+        You’ve successfully downloaded the calendar event.
+        Open your Downloads folder and tap the most recently downloaded event file to add it to your calendar.
+      </p>
+      <span id="calendarDownloadFileName" class="download-file-name"></span>
+      <button id="calendarDownloadClose" type="button">Got It</button>
+    </div>
+  </div>
+
 <script>
 const THEMES = [
   {
@@ -1032,6 +1116,9 @@ const toast = document.getElementById("toast");
 const toastTitle = document.getElementById("toastTitle");
 const toastMessage = document.getElementById("toastMessage");
 const hostingWarning = document.getElementById("hostingWarning");
+const calendarDownloadOverlay = document.getElementById("calendarDownloadOverlay");
+const calendarDownloadFileName = document.getElementById("calendarDownloadFileName");
+const calendarDownloadClose = document.getElementById("calendarDownloadClose");
 const imageUpload = document.getElementById("imageUpload");
 const imageStatus = document.getElementById("imageStatus");
 
@@ -1158,20 +1245,20 @@ function safeCalendarFileName(state) {
     .replace(/^-|-$/g,"") + ".ics";
 }
 
+function showCalendarDownloadConfirmation(state) {
+  const fileName = safeCalendarFileName(state);
+  calendarDownloadFileName.textContent = fileName;
+  calendarDownloadOverlay.hidden = false;
+}
+
+function closeCalendarDownloadConfirmation() {
+  calendarDownloadOverlay.hidden = true;
+}
+
 function openDeviceCalendar(state) {
   const ics = buildIcs(state);
-  const isiPhoneOrIPad =
-    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
   try {
-    if (isiPhoneOrIPad) {
-      // iOS handles an iCalendar document through the device's calendar/file handler.
-      window.location.href =
-        "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
-      return;
-    }
-
     const blob = new Blob([ics],{type:"text/calendar;charset=utf-8"});
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
@@ -1181,13 +1268,15 @@ function openDeviceCalendar(state) {
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
+
+    showCalendarDownloadConfirmation(state);
     setTimeout(() => URL.revokeObjectURL(url),1500);
   } catch (error) {
     console.error(error);
     notify(
       "error",
-      "Calendar file could not open",
-      "Choose Google Calendar instead, or try again in Safari or Chrome."
+      "Calendar download failed",
+      "The calendar event could not be downloaded. Please try again."
     );
   }
 }
@@ -1264,13 +1353,13 @@ function previewMarkup(state) {
               <div class="calendar-choice-menu" data-preview-calendar-menu hidden>
                 <button type="button" data-preview-device-calendar>
                   Apple / Phone Calendar
-                  <small>Opens or downloads a standard calendar event.</small>
+                  <small>Opens or downloads a standard calendar event file.</small>
                 </button>
 
-                <a href="${escapeHtml(calendarUrl(state))}" data-preview-google-calendar>
+                <button type="button" data-preview-google-calendar>
                   Google Calendar
-                  <small>May open the Google Calendar app when installed.</small>
-                </a>
+                  <small>Downloads the event file for Google Calendar or another compatible app.</small>
+                </button>
               </div>
             </div>
           </div>
@@ -1333,8 +1422,20 @@ function sbiCalendarRuntime(eventData) {
   const toggle = root.querySelector("[data-sbi-calendar-toggle]");
   const menu = root.querySelector("[data-sbi-calendar-menu]");
   const deviceButton = root.querySelector("[data-sbi-device-calendar]");
+  const googleButton = root.querySelector("[data-sbi-google-calendar]");
+  const downloadOverlay = root.querySelector("[data-sbi-download-overlay]");
+  const downloadFile = root.querySelector("[data-sbi-download-file]");
+  const downloadClose = root.querySelector("[data-sbi-download-close]");
 
-  if (!toggle || !menu || !deviceButton) return;
+  if (
+    !toggle ||
+    !menu ||
+    !deviceButton ||
+    !googleButton ||
+    !downloadOverlay ||
+    !downloadFile ||
+    !downloadClose
+  ) return;
 
   const escapeIcs = value => String(value || "")
     .replace(/\\/g,"\\\\")
@@ -1378,18 +1479,17 @@ function sbiCalendarRuntime(eventData) {
       .replace(/[^a-z0-9]+/g,"-")
       .replace(/^-|-$/g,"") + ".ics";
 
+  const showDownloadConfirmation = () => {
+    downloadFile.textContent = fileName();
+    downloadOverlay.hidden = false;
+  };
+
+  const closeDownloadConfirmation = () => {
+    downloadOverlay.hidden = true;
+  };
+
   const openDeviceCalendar = () => {
     const ics = buildIcs();
-    const isiPhoneOrIPad =
-      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
-    if (isiPhoneOrIPad) {
-      window.location.href =
-        "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
-      return;
-    }
-
     const blob = new Blob([ics],{type:"text/calendar;charset=utf-8"});
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
@@ -1399,6 +1499,8 @@ function sbiCalendarRuntime(eventData) {
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
+
+    showDownloadConfirmation();
     setTimeout(() => URL.revokeObjectURL(url),1500);
   };
 
@@ -1410,6 +1512,18 @@ function sbiCalendarRuntime(eventData) {
   deviceButton.addEventListener("click",() => {
     menu.hidden = true;
     openDeviceCalendar();
+  });
+
+  googleButton.addEventListener("click",() => {
+    menu.hidden = true;
+    openDeviceCalendar();
+  });
+
+  downloadClose.addEventListener("click",closeDownloadConfirmation);
+  downloadOverlay.addEventListener("click",event => {
+    if (event.target === downloadOverlay) {
+      closeDownloadConfirmation();
+    }
   });
 
   document.addEventListener("click",event => {
@@ -1607,6 +1721,77 @@ function embedCode(state) {
   font-size:.73rem;
   font-weight:500;
   line-height:1.35;
+}
+
+.sbi-download-overlay {
+  position:fixed;
+  inset:0;
+  z-index:2147483647;
+  display:grid;
+  place-items:center;
+  padding:20px;
+  background:rgba(44,31,39,.45);
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+}
+
+.sbi-download-overlay[hidden] {
+  display:none;
+}
+
+.sbi-download-card {
+  width:min(100%,430px);
+  padding:24px;
+  border-radius:24px;
+  background:white;
+  box-shadow:0 28px 70px rgba(44,31,39,.28);
+  text-align:center;
+}
+
+.sbi-download-icon {
+  width:62px;
+  height:62px;
+  margin:0 auto 14px;
+  display:grid;
+  place-items:center;
+  border-radius:20px;
+  background:linear-gradient(135deg,var(--sbi-soft),var(--sbi-soft2));
+  font-size:1.8rem;
+}
+
+.sbi-download-card h3 {
+  margin:0 0 10px !important;
+  color:var(--sbi-accent) !important;
+  font-family:"Playfair Display",serif !important;
+  font-size:1.45rem !important;
+}
+
+.sbi-download-card p {
+  margin:0 !important;
+  color:var(--sbi-muted) !important;
+  line-height:1.58 !important;
+}
+
+.sbi-download-file {
+  display:block;
+  margin-top:10px;
+  color:var(--sbi-ink);
+  font-size:.83rem;
+  font-weight:800;
+  overflow-wrap:anywhere;
+}
+
+.sbi-download-card button {
+  width:100%;
+  margin-top:18px;
+  border:0;
+  border-radius:999px;
+  padding:12px 16px;
+  color:white;
+  background:linear-gradient(135deg,var(--sbi-accent),var(--sbi-accent2));
+  font:inherit;
+  font-weight:800;
+  cursor:pointer;
 }
 
 .sbi-hero {
@@ -1880,10 +2065,10 @@ function embedCode(state) {
                 <small>Opens or downloads a standard calendar event.</small>
               </button>
 
-              <a href="${escapeHtml(calendarUrl(state))}" data-sbi-google-calendar>
+              <button type="button" data-sbi-google-calendar>
                 Google Calendar
-                <small>May open the Google Calendar app when installed.</small>
-              </a>
+                <small>Downloads the event file for Google Calendar or another compatible app.</small>
+              </button>
             </div>
           </div>
         </div>
@@ -1935,6 +2120,19 @@ function embedCode(state) {
       </div>
     </article>
   </div>
+
+  <div class="sbi-download-overlay" data-sbi-download-overlay hidden>
+    <div class="sbi-download-card" role="dialog" aria-modal="true" aria-label="Calendar event downloaded">
+      <div class="sbi-download-icon">📅</div>
+      <h3>Calendar Event Downloaded</h3>
+      <p>
+        You’ve successfully downloaded the calendar event.
+        Open your Downloads folder and tap the most recently downloaded event file to add it to your calendar.
+      </p>
+      <span class="sbi-download-file" data-sbi-download-file></span>
+      <button type="button" data-sbi-download-close>Got It</button>
+    </div>
+  </div>
 </section>
 
 
@@ -1950,6 +2148,7 @@ function render() {
   const previewToggle = preview.querySelector("[data-preview-calendar-toggle]");
   const previewMenu = preview.querySelector("[data-preview-calendar-menu]");
   const previewDevice = preview.querySelector("[data-preview-device-calendar]");
+  const previewGoogle = preview.querySelector("[data-preview-google-calendar]");
 
   if (previewToggle && previewMenu) {
     previewToggle.addEventListener("click",event => {
@@ -1958,6 +2157,11 @@ function render() {
     });
 
     previewDevice?.addEventListener("click",() => {
+      previewMenu.hidden = true;
+      openDeviceCalendar(state);
+    });
+
+    previewGoogle?.addEventListener("click",() => {
       previewMenu.hidden = true;
       openDeviceCalendar(state);
     });
@@ -2274,6 +2478,13 @@ document.getElementById("selectCodeBtn").addEventListener("click",() => {
 
 document.getElementById("hideCodeBtn").addEventListener("click",() => {
   codePanel.classList.remove("show");
+});
+
+calendarDownloadClose.addEventListener("click",closeCalendarDownloadConfirmation);
+calendarDownloadOverlay.addEventListener("click",event => {
+  if (event.target === calendarDownloadOverlay) {
+    closeCalendarDownloadConfirmation();
+  }
 });
 
 render();
