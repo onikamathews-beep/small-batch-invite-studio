@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8dce7">
-  <meta name="app-build" content="calendar-time-seconds-fix-5">
+  <meta name="app-build" content="shape-picker-and-image-centering-6">
   <title>Small Batch Invite Studio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -674,20 +674,45 @@
       position:relative;
       min-height:410px;
       display:flex;
-      align-items:flex-end;
+      align-items:center;
       justify-content:center;
     }
 
-    .art-blob {
+    .art-shape {
       position:absolute;
       right:3%;
       bottom:6%;
       width:92%;
       aspect-ratio:1/1;
       border:2px solid rgba(255,255,255,.88);
-      border-radius:47% 53% 58% 42% / 45% 44% 56% 55%;
       background:radial-gradient(circle at 42% 36%,rgba(255,255,255,.95),rgba(255,244,249,.88) 42%,rgba(224,239,222,.82) 100%);
       box-shadow:inset 0 0 0 8px rgba(255,255,255,.26),0 18px 36px rgba(107,71,87,.09);
+    }
+
+    .shape-blob {
+      border-radius:47% 53% 58% 42% / 45% 44% 56% 55%;
+    }
+
+    .shape-circle {
+      border-radius:999px;
+    }
+
+    .shape-square {
+      border-radius:28px;
+    }
+
+    .shape-octagon {
+      clip-path:polygon(30% 0%,70% 0%,100% 30%,100% 70%,70% 100%,30% 100%,0% 70%,0% 30%);
+      border-radius:0;
+    }
+
+    .shape-squiggle {
+      clip-path:polygon(12% 20%,31% 7%,52% 10%,70% 2%,86% 14%,97% 34%,92% 55%,99% 76%,84% 93%,63% 96%,44% 88%,24% 95%,7% 82%,2% 61%,10% 42%);
+      border-radius:0;
+    }
+
+    .shape-none {
+      display:none;
     }
 
     .art-frame {
@@ -697,7 +722,7 @@
       height:340px;
       overflow:hidden;
       display:flex;
-      align-items:flex-start;
+      align-items:center;
       justify-content:center;
     }
 
@@ -705,7 +730,7 @@
       width:100%;
       height:100%;
       object-fit:contain;
-      object-position:center top;
+      object-position:center center;
       filter:drop-shadow(0 12px 18px rgba(68,46,55,.16));
     }
 
@@ -824,7 +849,7 @@
       }
       .date-ribbon { justify-content:center; }
       .art-wrap { min-height:auto;margin-top:8px; }
-      .art-blob {
+      .art-shape {
         right:50%;
         width:min(94%,380px);
         transform:translateX(50%);
@@ -898,6 +923,18 @@
           <select id="showImage">
             <option value="yes">Show chibis</option>
             <option value="no">No image</option>
+          </select>
+        </label>
+
+        <label>
+          Shape behind chibis
+          <select id="imageShape">
+            <option value="blob">Soft blob</option>
+            <option value="circle">Circle</option>
+            <option value="square">Rounded square</option>
+            <option value="octagon">Octagon</option>
+            <option value="squiggle">Squiggle</option>
+            <option value="none">No shape</option>
           </select>
         </label>
 
@@ -1098,13 +1135,14 @@ const DEFAULTS = {
   endDateTime:"2026-08-15T14:30",
   timezone:"America/Phoenix",
   showImage:"yes",
+  imageShape:"blob",
   theme:0
 };
 
 const fieldIds = [
   "template","topLabel","title","hostLine","message","closing",
   "dateDisplay","timeDisplay","venueName","streetAddress","cityStateZip","mapsUrl",
-  "calendarTitle","calendarDescription","startDateTime","endDateTime","timezone","showImage"
+  "calendarTitle","calendarDescription","startDateTime","endDateTime","timezone","showImage","imageShape"
 ];
 
 const fields = Object.fromEntries(fieldIds.map(id => [id,document.getElementById(id)]));
@@ -1331,7 +1369,7 @@ function buildThemeButtons() {
 function previewMarkup(state) {
   const art = state.showImage === "yes" ? `
     <div class="art-wrap">
-      <div class="art-blob"></div>
+      <div class="art-shape shape-${escapeHtml(state.imageShape || "blob")}"></div>
       <span class="heart h1">♥</span>
       <span class="heart h2">♥</span>
       <div class="art-frame">
@@ -1568,7 +1606,7 @@ function embedCode(state) {
   const image = currentImageUrl();
   const imageMarkup = state.showImage === "yes" ? `
       <div class="sbi-art">
-        <div class="sbi-blob"></div>
+        <div class="sbi-shape sbi-shape-${escapeHtml(state.imageShape || "blob")}"></div>
         <span class="sbi-heart sbi-h1">♥</span>
         <span class="sbi-heart sbi-h2">♥</span>
         <div class="sbi-art-frame">
@@ -1885,20 +1923,45 @@ function embedCode(state) {
   position:relative;
   min-height:410px;
   display:flex;
-  align-items:flex-end;
+  align-items:center;
   justify-content:center;
 }
 
-.sbi-blob {
+.sbi-shape {
   position:absolute;
   right:3%;
   bottom:6%;
   width:92%;
   aspect-ratio:1/1;
   border:2px solid rgba(255,255,255,.88);
-  border-radius:47% 53% 58% 42% / 45% 44% 56% 55%;
   background:radial-gradient(circle at 42% 36%,rgba(255,255,255,.95),rgba(255,244,249,.88) 42%,rgba(224,239,222,.82) 100%);
   box-shadow:inset 0 0 0 8px rgba(255,255,255,.26),0 18px 36px rgba(107,71,87,.09);
+}
+
+.sbi-shape-blob {
+  border-radius:47% 53% 58% 42% / 45% 44% 56% 55%;
+}
+
+.sbi-shape-circle {
+  border-radius:999px;
+}
+
+.sbi-shape-square {
+  border-radius:28px;
+}
+
+.sbi-shape-octagon {
+  clip-path:polygon(30% 0%,70% 0%,100% 30%,100% 70%,70% 100%,30% 100%,0% 70%,0% 30%);
+  border-radius:0;
+}
+
+.sbi-shape-squiggle {
+  clip-path:polygon(12% 20%,31% 7%,52% 10%,70% 2%,86% 14%,97% 34%,92% 55%,99% 76%,84% 93%,63% 96%,44% 88%,24% 95%,7% 82%,2% 61%,10% 42%);
+  border-radius:0;
+}
+
+.sbi-shape-none {
+  display:none;
 }
 
 .sbi-art-frame {
@@ -1908,7 +1971,7 @@ function embedCode(state) {
   height:340px;
   overflow:hidden;
   display:flex;
-  align-items:flex-start;
+  align-items:center;
   justify-content:center;
 }
 
@@ -1916,7 +1979,7 @@ function embedCode(state) {
   width:100%;
   height:100%;
   object-fit:contain;
-  object-position:center top;
+  object-position:center center;
   filter:drop-shadow(0 12px 18px rgba(68,46,55,.16));
 }
 
@@ -2025,7 +2088,7 @@ function embedCode(state) {
   }
   .sbi-ribbon { justify-content:center; }
   .sbi-art { min-height:auto;margin-top:8px; }
-  .sbi-blob {
+  .sbi-shape {
     right:50%;
     width:min(94%,380px);
     transform:translateX(50%);
