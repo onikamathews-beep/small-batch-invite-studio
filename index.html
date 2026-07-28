@@ -249,6 +249,57 @@
       border:1px solid rgba(168,73,112,.10);
     }
 
+    .chibi-upload-prominent {
+      border:2px solid var(--accent);
+      background:linear-gradient(135deg,#fff8fb,#f6f0ff);
+      box-shadow:0 14px 30px rgba(104,65,84,.12);
+    }
+
+    .chibi-upload-heading {
+      display:flex;
+      align-items:center;
+      gap:11px;
+      margin-bottom:12px;
+    }
+
+    .chibi-upload-heading h2 {
+      margin:0 0 3px;
+      font-size:1.06rem;
+    }
+
+    .chibi-upload-heading p {
+      margin:0;
+      color:var(--muted);
+      font-size:.8rem;
+      line-height:1.4;
+    }
+
+    .chibi-upload-icon {
+      width:42px;
+      height:42px;
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+      border-radius:14px;
+      background:white;
+      box-shadow:0 8px 18px rgba(104,65,84,.08);
+      font-size:1.25rem;
+    }
+
+    .chibi-file-label {
+      display:block;
+      padding:12px;
+      border:2px dashed rgba(168,73,112,.35);
+      border-radius:15px;
+      background:white;
+    }
+
+    .chibi-file-label input[type="file"] {
+      display:block;
+      width:100%;
+      margin-top:8px;
+    }
+
     .image-upload-box input[type="file"] {
       width:100%;
       margin-top:7px;
@@ -697,6 +748,38 @@
         <button id="resetBtn" class="btn secondary" type="button">Reset</button>
       </div>
 
+      <section class="section chibi-upload-prominent">
+        <div class="chibi-upload-heading">
+          <span class="chibi-upload-icon">🖼️</span>
+          <div>
+            <h2>Upload Your Chibis</h2>
+            <p>Choose the transparent PNG you want displayed on the invitation.</p>
+          </div>
+        </div>
+
+        <label class="chibi-file-label">
+          Choose chibi image
+          <input id="imageUpload" type="file" accept="image/png,image/webp,image/jpeg">
+        </label>
+
+        <label>
+          Display
+          <select id="showImage">
+            <option value="yes">Show chibis</option>
+            <option value="no">No image</option>
+          </select>
+        </label>
+
+        <div class="image-upload-actions">
+          <button id="useBuiltInBtn" class="btn secondary" type="button">Use Built-In</button>
+          <button id="hideImageBtn" class="btn secondary" type="button">Hide Image</button>
+        </div>
+
+        <div id="imageStatus" class="image-status">
+          Using the built-in welcoming chibis.
+        </div>
+      </section>
+
       <section class="section">
         <h2>Quick Template</h2>
         <label>
@@ -749,32 +832,6 @@
         </label>
       </section>
 
-      <section class="section">
-        <h2>Chibi Image</h2>
-        <label>
-          Display
-          <select id="showImage">
-            <option value="yes">Show chibis</option>
-            <option value="no">No image</option>
-          </select>
-        </label>
-
-        <div class="image-upload-box">
-          <label>
-            Upload my chibis
-            <input id="imageUpload" type="file" accept="image/png,image/webp,image/jpeg">
-          </label>
-
-          <div class="image-upload-actions">
-            <button id="useBuiltInBtn" class="btn secondary" type="button">Use Built-In</button>
-            <button id="hideImageBtn" class="btn secondary" type="button">Hide Image</button>
-          </div>
-
-          <div id="imageStatus" class="image-status">
-            Using the built-in welcoming chibis.
-          </div>
-        </div>
-      </section>
 
       <section class="section">
         <h2>Color Theme</h2>
