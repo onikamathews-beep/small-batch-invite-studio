@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8dce7">
-  <meta name="app-build" content="google-sites-mobile-layout-fix-10">
+  <meta name="app-build" content="mobile-kingdom-hall-buttons-11">
   <title>Small Batch Invite Studio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -992,6 +992,13 @@
       font-size:.98rem;
     }
 
+    .planning-field-label {
+      margin-top:10px;
+      color:var(--ink);
+      font-size:.82rem;
+      font-weight:800;
+    }
+
     .planning-field-grid {
       display:grid;
       grid-template-columns:repeat(2,minmax(0,1fr));
@@ -1017,6 +1024,33 @@
     .planning-preview-card textarea {
       min-height:76px;
       resize:vertical;
+    }
+
+    .planning-choice-row {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:9px;
+      margin-top:7px;
+    }
+
+    .planning-choice {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:44px;
+      margin:0;
+      border:1px solid rgba(111,77,93,.17);
+      border-radius:12px;
+      background:white;
+      color:var(--ink);
+      font-weight:900;
+    }
+
+    .planning-choice input {
+      width:18px;
+      height:18px;
+      margin:0 7px 0 0;
+      accent-color:var(--accent);
     }
 
     .planning-submit-preview {
@@ -1956,14 +1990,19 @@ function previewActivityFields(day,activity) {
           <label>Start time<input type="time" disabled></label>
           <label>End time<input type="time" disabled></label>
         </div>
-        <label>
-          Meet at the Kingdom Hall?
-          <select disabled>
-            <option>Select Yes or No</option>
-            <option>Yes</option>
-            <option>No</option>
-          </select>
-        </label>
+        <div>
+          <div class="planning-field-label">Meet at the Kingdom Hall?</div>
+          <div class="planning-choice-row">
+            <label class="planning-choice">
+              <input type="radio" disabled>
+              Yes
+            </label>
+            <label class="planning-choice">
+              <input type="radio" disabled>
+              No
+            </label>
+          </div>
+        </div>
         <label hidden>Other meeting location or address<input type="text" disabled></label>
         <label>Service notes<textarea disabled></textarea></label>
       </div>
@@ -2492,14 +2531,18 @@ function sbiCalendarRuntime(runtimeConfig) {
     } catch {}
   };
 
-  const updateServiceLocation = select => {
-    const day = select.dataset.sbiServiceChoice;
+  const updateServiceLocation = day => {
     const otherWrap = root.querySelector(`[data-sbi-service-other="${day}"]`);
     const otherInput = otherWrap ? otherWrap.querySelector("input") : null;
-    const showOther = select.value === "no";
+    const choice = formValue(`${day}_service_kh`);
+    const showOther = choice === "no";
 
     if (otherWrap) otherWrap.hidden = !showOther;
-    if (otherInput) otherInput.required = showOther;
+
+    if (otherInput) {
+      otherInput.required = showOther;
+      if (!showOther) otherInput.value = "";
+    }
   };
 
   const makeDaySummary = (dayKey,dayLabel,config) => {
@@ -2595,12 +2638,38 @@ function sbiCalendarRuntime(runtimeConfig) {
 
   restoreLocally();
 
-  root.querySelectorAll("[data-sbi-service-choice]").forEach(select => {
-    updateServiceLocation(select);
-    select.addEventListener("change",() => {
-      updateServiceLocation(select);
+  const serviceChoiceDays = new Set();
+
+  root.querySelectorAll("[data-sbi-service-choice]").forEach(choice => {
+    const day = choice.dataset.sbiServiceChoice;
+    serviceChoiceDays.add(day);
+
+    choice.addEventListener("change",() => {
+      root
+        .querySelectorAll(`[data-sbi-service-choice="${day}"]`)
+        .forEach(option => {
+          option.closest(".sbi-choice")?.classList.toggle(
+            "selected",
+            option.checked
+          );
+        });
+
+      updateServiceLocation(day);
       saveLocally();
     });
+  });
+
+  serviceChoiceDays.forEach(day => {
+    root
+      .querySelectorAll(`[data-sbi-service-choice="${day}"]`)
+      .forEach(option => {
+        option.closest(".sbi-choice")?.classList.toggle(
+          "selected",
+          option.checked
+        );
+      });
+
+    updateServiceLocation(day);
   });
 
   savedControls.forEach(field => {
@@ -2732,18 +2801,33 @@ function recipientActivityMarkup(day,activity) {
           </label>
         </div>
 
-        <label>
-          Meet at the Kingdom Hall?
-          <select
-            name="${formFieldName(day,"service","kh")}"
-            data-sbi-service-choice="${day.key}"
-            required
-          >
-            <option value="">Select Yes or No</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-        </label>
+        <div class="sbi-choice-question">Meet at the Kingdom Hall?</div>
+
+        <div class="sbi-choice-row" role="radiogroup" aria-label="Meet at the Kingdom Hall?">
+          <label class="sbi-choice">
+            <input
+              type="radio"
+              name="${formFieldName(day,"service","kh")}"
+              value="yes"
+              data-sbi-service-choice="${day.key}"
+              required
+            >
+            <span class="sbi-choice-mark" aria-hidden="true"></span>
+            Yes
+          </label>
+
+          <label class="sbi-choice">
+            <input
+              type="radio"
+              name="${formFieldName(day,"service","kh")}"
+              value="no"
+              data-sbi-service-choice="${day.key}"
+              required
+            >
+            <span class="sbi-choice-mark" aria-hidden="true"></span>
+            No
+          </label>
+        </div>
 
         <label data-sbi-service-other="${day.key}" hidden>
           Other meeting location or address
@@ -3522,6 +3606,73 @@ function embedCode(state) {
 .sbi-plan-form textarea {
   min-height:82px;
   resize:vertical;
+}
+
+.sbi-choice-question {
+  margin-top:10px;
+  color:var(--sbi-ink);
+  font-size:.82rem;
+  font-weight:800;
+}
+
+.sbi-choice-row {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:7px;
+}
+
+.sbi-choice {
+  position:relative;
+  display:flex !important;
+  align-items:center;
+  justify-content:center;
+  min-height:48px;
+  margin:0 !important;
+  border:1px solid rgba(111,77,93,.18);
+  border-radius:13px;
+  background:white;
+  color:var(--sbi-ink);
+  font-weight:900 !important;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+
+.sbi-choice input[type="radio"] {
+  position:absolute;
+  width:1px;
+  height:1px;
+  margin:0;
+  opacity:0;
+  pointer-events:none;
+}
+
+.sbi-choice:has(input:checked) {
+  border-color:var(--sbi-accent);
+  color:var(--sbi-accent);
+  background:linear-gradient(135deg,var(--sbi-soft),rgba(255,255,255,.96));
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--sbi-accent) 13%,transparent);
+}
+
+.sbi-choice.selected {
+  border-color:var(--sbi-accent);
+  color:var(--sbi-accent);
+  background:linear-gradient(135deg,var(--sbi-soft),rgba(255,255,255,.96));
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--sbi-accent) 13%,transparent);
+}
+
+.sbi-choice-mark {
+  width:18px;
+  height:18px;
+  margin-right:8px;
+  border:2px solid rgba(111,77,93,.32);
+  border-radius:999px;
+  background:white;
+}
+
+.sbi-choice input:checked + .sbi-choice-mark {
+  border:5px solid var(--sbi-accent);
 }
 
 .sbi-plan-grid {
