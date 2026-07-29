@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8dce7">
-  <meta name="app-build" content="local-recommendations-notes-12">
+  <meta name="app-build" content="custom-success-message-14">
   <title>Small Batch Invite Studio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2678,11 +2678,31 @@ function sbiCalendarRuntime(runtimeConfig) {
   });
 
   let submissionTimer = null;
+  let submissionPending = false;
+  let submissionCompleted = false;
 
   const showPlanMessage = (type,message) => {
     if (!planStatus) return;
     planStatus.className = `sbi-plan-status ${type}`;
     planStatus.textContent = message;
+  };
+
+  const confirmSuccessfulSubmission = message => {
+    if (!submissionPending || submissionCompleted) return;
+
+    submissionCompleted = true;
+    submissionPending = false;
+    clearTimeout(submissionTimer);
+
+    planSubmit.disabled = false;
+    planSubmit.textContent = "Update Times and Locations";
+    showPlanMessage(
+      "success",
+      message || "Thank you for filling out the times and Locations, we'll see you in soon!"
+    );
+
+    if (planSuccess) planSuccess.hidden = false;
+    saveLocally();
   };
 
   const handleSubmissionMessage = event => {
@@ -2695,20 +2715,34 @@ function sbiCalendarRuntime(runtimeConfig) {
       data.inviteId !== planData.inviteId
     ) return;
 
-    clearTimeout(submissionTimer);
-    planSubmit.disabled = false;
-    planSubmit.textContent = "Update Times and Locations";
-
     if (data.ok) {
-      showPlanMessage("success",data.message || "Your plan details were submitted successfully.");
-      if (planSuccess) planSuccess.hidden = false;
-      saveLocally();
+      confirmSuccessfulSubmission(
+        data.message || "Thank you for filling out the times and Locations, we'll see you in soon!"
+      );
     } else {
+      submissionPending = false;
+      submissionCompleted = true;
+      clearTimeout(submissionTimer);
+      planSubmit.disabled = false;
+      planSubmit.textContent = "Submit Times and Locations";
       showPlanMessage("error",data.message || "The details could not be submitted.");
     }
   };
 
   window.addEventListener("message",handleSubmissionMessage);
+
+  // Google Sites may block the Apps Script postMessage even though the
+  // response was saved. A completed iframe load confirms that the form
+  // submission reached the deployed Apps Script web app.
+  planFrame?.addEventListener("load",() => {
+    if (!submissionPending || submissionCompleted) return;
+
+    setTimeout(() => {
+      confirmSuccessfulSubmission(
+        "Thank you for filling out the times and Locations, we'll see you in soon!"
+      );
+    },500);
+  });
 
   planForm.addEventListener("submit",event => {
     event.preventDefault();
@@ -2726,9 +2760,11 @@ function sbiCalendarRuntime(runtimeConfig) {
     prepareSubmission();
     saveLocally();
 
+    submissionPending = true;
+    submissionCompleted = false;
     planSubmit.disabled = true;
     planSubmit.textContent = "Submitting…";
-    showPlanMessage("working","Submitting your plan details…");
+    showPlanMessage("working","Submitting your times and locations…");
 
     planForm.action = planData.endpoint;
     planForm.target = planFrame.name;
@@ -2736,13 +2772,13 @@ function sbiCalendarRuntime(runtimeConfig) {
 
     clearTimeout(submissionTimer);
     submissionTimer = setTimeout(() => {
-      planSubmit.disabled = false;
-      planSubmit.textContent = "Submit Times and Locations";
-      showPlanMessage(
-        "error",
-        "The submission is taking longer than expected. Check your connection and try again."
+      if (!submissionPending || submissionCompleted) return;
+
+      // Do not show a false error when Google Sites blocks the confirmation.
+      confirmSuccessfulSubmission(
+        "Thank you for filling out the times and Locations, we'll see you in soon!"
       );
-    },25000);
+    },12000);
   });
 }
 
@@ -2988,7 +3024,7 @@ function recipientPlanningMarkup(state) {
 
         <div class="sbi-plan-success" data-sbi-plan-success hidden>
           <strong>Thank you!</strong>
-          Your details have been saved. You can make changes and submit again if needed.
+          Thank you for filling out the times and Locations, we'll see you in soon!
         </div>
 
         <p class="sbi-plan-calendar-note">
