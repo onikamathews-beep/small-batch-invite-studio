@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8dce7">
-  <meta name="app-build" content="shape-picker-and-image-centering-6">
+  <meta name="app-build" content="recipient-planning-form-8">
   <title>Small Batch Invite Studio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -811,6 +811,222 @@
       line-height:1.55;
     }
 
+    .bottom-calendar-wrap {
+      position:relative;
+      z-index:8;
+      display:flex;
+      justify-content:center;
+      padding:0 24px 34px;
+    }
+
+    .bottom-calendar-inner {
+      position:relative;
+    }
+
+    .bottom-calendar-wrap .calendar-choice-menu {
+      top:auto;
+      bottom:calc(100% + 9px);
+      left:50%;
+      right:auto;
+      transform:translateX(-50%);
+    }
+
+    .planning-setup-note {
+      margin:0 0 12px;
+      padding:11px 12px;
+      border-radius:14px;
+      color:var(--muted);
+      background:linear-gradient(135deg,#fff7fb,#f7f3ff);
+      font-size:.8rem;
+      line-height:1.5;
+    }
+
+    .planning-id-row {
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:8px;
+      align-items:end;
+    }
+
+    .planning-id-row .btn {
+      min-height:43px;
+      margin-bottom:10px;
+      white-space:nowrap;
+    }
+
+    .plan-builder {
+      display:grid;
+      gap:9px;
+      margin-top:10px;
+    }
+
+    .plan-builder-day {
+      overflow:hidden;
+      border:1px solid rgba(168,73,112,.14);
+      border-radius:16px;
+      background:rgba(255,255,255,.78);
+    }
+
+    .plan-builder-day.active {
+      border-color:rgba(168,73,112,.35);
+      box-shadow:0 8px 18px rgba(101,67,82,.06);
+    }
+
+    .plan-day-toggle {
+      display:flex;
+      align-items:center;
+      gap:9px;
+      margin:0;
+      padding:11px 12px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .plan-day-toggle input,
+    .plan-activity-option input {
+      width:18px;
+      height:18px;
+      margin:0;
+      accent-color:var(--accent);
+    }
+
+    .plan-day-date {
+      margin-left:auto;
+      color:var(--muted);
+      font-size:.72rem;
+      font-weight:700;
+    }
+
+    .plan-activities {
+      display:grid;
+      gap:7px;
+      padding:0 12px 12px;
+    }
+
+    .plan-activity-option {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin:0;
+      padding:9px 10px;
+      border-radius:12px;
+      background:linear-gradient(135deg,var(--soft),rgba(255,255,255,.85));
+      color:var(--ink);
+      font-size:.82rem;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .planning-settings[hidden] {
+      display:none;
+    }
+
+    .planning-preview-card {
+      margin:0 38px 30px;
+      padding:24px;
+      border:1px solid rgba(168,73,112,.15);
+      border-radius:28px;
+      background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(250,244,255,.88));
+      box-shadow:0 14px 30px rgba(91,57,72,.08);
+    }
+
+    .planning-preview-head {
+      margin-bottom:18px;
+      text-align:center;
+    }
+
+    .planning-preview-head h2 {
+      margin:0 0 7px;
+      color:var(--accent);
+      font-family:"Playfair Display",serif;
+      font-size:1.55rem;
+    }
+
+    .planning-preview-head p {
+      max-width:620px;
+      margin:0 auto;
+      color:var(--muted);
+      line-height:1.55;
+    }
+
+    .planning-day-card {
+      margin-top:13px;
+      padding:17px;
+      border:1px solid rgba(168,73,112,.13);
+      border-radius:20px;
+      background:rgba(255,255,255,.82);
+    }
+
+    .planning-day-title {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:13px;
+      color:var(--accent);
+      font-weight:900;
+    }
+
+    .planning-day-title span:last-child {
+      color:var(--muted);
+      font-size:.79rem;
+    }
+
+    .planning-activity-card {
+      margin-top:10px;
+      padding:14px;
+      border-radius:16px;
+      background:linear-gradient(135deg,var(--soft),rgba(255,255,255,.92));
+    }
+
+    .planning-activity-card h3 {
+      margin:0 0 11px;
+      font-size:.98rem;
+    }
+
+    .planning-field-grid {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .planning-preview-card input,
+    .planning-preview-card select,
+    .planning-preview-card textarea {
+      width:100%;
+      margin-top:6px;
+      border:1px solid rgba(111,77,93,.17);
+      border-radius:12px;
+      padding:10px 11px;
+      color:var(--ink);
+      background:white;
+    }
+
+    .planning-preview-card textarea {
+      min-height:76px;
+      resize:vertical;
+    }
+
+    .planning-submit-preview {
+      width:100%;
+      margin-top:18px;
+      border:0;
+      border-radius:999px;
+      padding:13px 18px;
+      color:white;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      font-weight:900;
+      opacity:.8;
+    }
+
+    .planning-calendar-note {
+      margin:12px 0 0;
+      color:var(--muted);
+      font-size:.78rem;
+      line-height:1.5;
+      text-align:center;
+    }
+
     @media (max-width:1020px) {
       .app { grid-template-columns:1fr; }
       .editor {
@@ -873,10 +1089,13 @@
       .detail-label { grid-area:label;margin-top:3px; }
       .detail-value { grid-area:value; }
       .closing-wrap { padding:0 20px 28px; }
+      .planning-preview-card { margin:0 20px 26px;padding:18px; }
+      .planning-field-grid { grid-template-columns:1fr; }
     }
 
     @media (max-width:520px) {
-      .toolbar,.two,.code-actions,.image-upload-actions { grid-template-columns:1fr; }
+      .toolbar,.two,.code-actions,.image-upload-actions,.planning-id-row { grid-template-columns:1fr; }
+      .planning-id-row .btn { margin:0 0 10px; }
     }
   </style>
 </head>
@@ -954,6 +1173,7 @@
           Event type
           <select id="template">
             <option value="service">Service Plans</option>
+            <option value="serviceTrip">Service Trip / Weekend</option>
             <option value="family">Family Worship</option>
             <option value="dinner">Dinner Together</option>
             <option value="custom">Custom Event</option>
@@ -998,6 +1218,58 @@
             <option value="America/New_York">America/New_York</option>
           </select>
         </label>
+      </section>
+
+      <section class="section">
+        <h2>Recipient Planning Form</h2>
+        <p class="planning-setup-note">
+          You choose the days and planned activities. The receiving couple fills in the
+          times, addresses and notes on the invitation. Submitting again updates the
+          same Google Sheet row.
+        </p>
+
+        <label>
+          Include recipient form
+          <select id="responseFormEnabled">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+          </select>
+        </label>
+
+        <div id="planningSettings" class="planning-settings">
+          <label>
+            Private invitation label
+            <input id="invitationLabel" type="text" placeholder="Sedona Weekend - Smiths">
+          </label>
+
+          <div class="planning-id-row">
+            <label>
+              Invitation ID
+              <input id="invitationId" type="text" readonly>
+            </label>
+            <button id="newInviteIdBtn" class="btn secondary" type="button">New Invitation ID</button>
+          </div>
+
+          <input id="invitationToken" type="hidden">
+
+          <label>
+            Week starting Monday
+            <input id="planWeekStart" type="date">
+          </label>
+
+          <label>
+            Google Apps Script web-app URL
+            <input id="responseEndpoint" type="url" placeholder="https://script.google.com/macros/s/.../exec">
+          </label>
+
+          <label>
+            Form introduction
+            <textarea id="planningIntro">Please fill in the missing details for the plans below. Your response will update this invitation's private planning row.</textarea>
+          </label>
+
+          <h3 class="section-mini-title">Choose days and activities</h3>
+          <div id="planBuilder" class="plan-builder"></div>
+        </div>
       </section>
 
 
@@ -1087,6 +1359,33 @@ const TEMPLATES = {
     calendarTitle:"Service Plans with the Mitchel Family",
     calendarDescription:"We’re so glad you’ll be joining us for service! Thank you for making the drive up to Superior. We’re looking forward to spending the day together."
   },
+  serviceTrip:{
+    topLabel:"Service Trip Plans",
+    title:"Sedona Service Weekend",
+    hostLine:"Service, the Meeting and Time Together",
+    message:"We’re looking forward to traveling up to Sedona and spending this special time together. We’ll choose the planned days and activities, and you can fill in the times, addresses and any helpful notes below.",
+    closing:"We’re really looking forward to the trip and the encouraging time together!",
+    calendarTitle:"Sedona Service Weekend",
+    calendarDescription:"Service, the congregation meeting and time together in Sedona.",
+    dateDisplay:"Service Weekend",
+    timeDisplay:"Times to be confirmed",
+    venueName:"Sedona, Arizona",
+    streetAddress:"",
+    cityStateZip:"Sedona, AZ",
+    mapsUrl:"https://www.google.com/maps/search/?api=1&query=Sedona+Arizona",
+    responseFormEnabled:"yes",
+    invitationLabel:"Sedona Service Weekend",
+    planningIntro:"Please fill in the times, addresses and notes for the plans we selected below.",
+    planConfig:{
+      monday:{enabled:false,service:false,meeting:false,other:false},
+      tuesday:{enabled:false,service:false,meeting:false,other:false},
+      wednesday:{enabled:false,service:false,meeting:false,other:false},
+      thursday:{enabled:false,service:false,meeting:false,other:false},
+      friday:{enabled:true,service:true,meeting:false,other:false},
+      saturday:{enabled:true,service:false,meeting:true,other:false},
+      sunday:{enabled:true,service:true,meeting:false,other:false}
+    }
+  },
   family:{
     topLabel:"See You Soon!",
     title:"Family Worship",
@@ -1136,13 +1435,31 @@ const DEFAULTS = {
   timezone:"America/Phoenix",
   showImage:"yes",
   imageShape:"blob",
+  responseFormEnabled:"no",
+  invitationLabel:"",
+  invitationId:"",
+  invitationToken:"",
+  planWeekStart:"",
+  responseEndpoint:"",
+  planningIntro:"Please fill in the missing details for the plans below.",
+  planConfig:{
+    monday:{enabled:false,service:false,meeting:false,other:false},
+    tuesday:{enabled:false,service:false,meeting:false,other:false},
+    wednesday:{enabled:false,service:false,meeting:false,other:false},
+    thursday:{enabled:false,service:false,meeting:false,other:false},
+    friday:{enabled:false,service:false,meeting:false,other:false},
+    saturday:{enabled:false,service:false,meeting:false,other:false},
+    sunday:{enabled:false,service:false,meeting:false,other:false}
+  },
   theme:0
 };
 
 const fieldIds = [
   "template","topLabel","title","hostLine","message","closing",
   "dateDisplay","timeDisplay","venueName","streetAddress","cityStateZip","mapsUrl",
-  "calendarTitle","calendarDescription","startDateTime","endDateTime","timezone","showImage","imageShape"
+  "calendarTitle","calendarDescription","startDateTime","endDateTime","timezone","showImage","imageShape",
+  "responseFormEnabled","invitationLabel","invitationId","invitationToken","planWeekStart",
+  "responseEndpoint","planningIntro"
 ];
 
 const fields = Object.fromEntries(fieldIds.map(id => [id,document.getElementById(id)]));
@@ -1159,11 +1476,24 @@ const calendarDownloadFileName = document.getElementById("calendarDownloadFileNa
 const calendarDownloadClose = document.getElementById("calendarDownloadClose");
 const imageUpload = document.getElementById("imageUpload");
 const imageStatus = document.getElementById("imageStatus");
+const planBuilder = document.getElementById("planBuilder");
+const planningSettings = document.getElementById("planningSettings");
+
+const PLAN_DAYS = [
+  {key:"monday",label:"Monday",offset:0},
+  {key:"tuesday",label:"Tuesday",offset:1},
+  {key:"wednesday",label:"Wednesday",offset:2},
+  {key:"thursday",label:"Thursday",offset:3},
+  {key:"friday",label:"Friday",offset:4},
+  {key:"saturday",label:"Saturday",offset:5},
+  {key:"sunday",label:"Sunday",offset:6}
+];
 
 let currentTheme = 0;
 let toastTimer = null;
 let uploadedImageData = "";
 let uploadedImageName = "";
+let planConfig = JSON.parse(JSON.stringify(DEFAULTS.planConfig));
 
 function isHosted() {
   return location.protocol === "https:" || location.protocol === "http:";
@@ -1205,9 +1535,142 @@ function escapeHtml(value) {
     .replace(/"/g,"&quot;");
 }
 
+function clonePlanConfig(value) {
+  return JSON.parse(JSON.stringify(value || DEFAULTS.planConfig));
+}
+
+function normalizePlanConfig(value) {
+  const normalized = clonePlanConfig(DEFAULTS.planConfig);
+
+  PLAN_DAYS.forEach(day => {
+    const incoming = value && value[day.key] ? value[day.key] : {};
+    normalized[day.key] = {
+      enabled:Boolean(incoming.enabled),
+      service:Boolean(incoming.service),
+      meeting:Boolean(incoming.meeting),
+      other:Boolean(incoming.other)
+    };
+  });
+
+  return normalized;
+}
+
+function makeRandomPart(length=8) {
+  const alphabet = "abcdefghjkmnpqrstuvwxyz23456789";
+  const bytes = new Uint8Array(length);
+
+  if (window.crypto && crypto.getRandomValues) {
+    crypto.getRandomValues(bytes);
+  } else {
+    for (let index=0; index<length; index += 1) {
+      bytes[index] = Math.floor(Math.random() * 256);
+    }
+  }
+
+  return [...bytes].map(value => alphabet[value % alphabet.length]).join("");
+}
+
+function generateInvitationIdentity() {
+  const now = Date.now().toString(36);
+  return {
+    id:`invite-${now}-${makeRandomPart(6)}`,
+    token:`${makeRandomPart(16)}${makeRandomPart(16)}`
+  };
+}
+
+function ensureInvitationIdentity() {
+  if (!fields.invitationId.value || !fields.invitationToken.value) {
+    const identity = generateInvitationIdentity();
+    fields.invitationId.value = identity.id;
+    fields.invitationToken.value = identity.token;
+  }
+}
+
+function planDate(dayOffset,state=readState()) {
+  if (!state.planWeekStart) return "";
+
+  const [year,month,date] = state.planWeekStart.split("-").map(Number);
+  if (!year || !month || !date) return "";
+
+  const value = new Date(year,month-1,date + dayOffset);
+  return new Intl.DateTimeFormat("en-US",{
+    month:"short",
+    day:"numeric",
+    year:"numeric"
+  }).format(value);
+}
+
+function selectedPlanDays(config=planConfig) {
+  return PLAN_DAYS.filter(day => {
+    const item = config[day.key];
+    return item && item.enabled && (item.service || item.meeting || item.other);
+  });
+}
+
+function renderPlanBuilder() {
+  if (!planBuilder) return;
+
+  const state = {};
+  fieldIds.forEach(id => state[id] = fields[id] ? fields[id].value : "");
+
+  planBuilder.innerHTML = PLAN_DAYS.map(day => {
+    const item = planConfig[day.key] || {};
+    const dateText = planDate(day.offset,state);
+
+    return `
+      <div class="plan-builder-day ${item.enabled ? "active" : ""}">
+        <label class="plan-day-toggle">
+          <input
+            type="checkbox"
+            data-plan-day="${day.key}"
+            ${item.enabled ? "checked" : ""}
+          >
+          <span>${day.label}</span>
+          <span class="plan-day-date">${escapeHtml(dateText)}</span>
+        </label>
+
+        <div class="plan-activities" ${item.enabled ? "" : "hidden"}>
+          <label class="plan-activity-option">
+            <input
+              type="checkbox"
+              data-plan-activity="service"
+              data-plan-activity-day="${day.key}"
+              ${item.service ? "checked" : ""}
+            >
+            Service
+          </label>
+
+          <label class="plan-activity-option">
+            <input
+              type="checkbox"
+              data-plan-activity="meeting"
+              data-plan-activity-day="${day.key}"
+              ${item.meeting ? "checked" : ""}
+            >
+            Congregation meeting
+          </label>
+
+          <label class="plan-activity-option">
+            <input
+              type="checkbox"
+              data-plan-activity="other"
+              data-plan-activity-day="${day.key}"
+              ${item.other ? "checked" : ""}
+            >
+            Other
+          </label>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  planningSettings.hidden = fields.responseFormEnabled.value !== "yes";
+}
+
 function readState() {
   const state = {};
   fieldIds.forEach(id => state[id] = fields[id].value);
+  state.planConfig = clonePlanConfig(planConfig);
   state.theme = currentTheme;
   return state;
 }
@@ -1216,7 +1679,11 @@ function writeState(state) {
   fieldIds.forEach(id => {
     fields[id].value = state[id] ?? "";
   });
+
+  planConfig = normalizePlanConfig(state.planConfig);
+  ensureInvitationIdentity();
   currentTheme = Number(state.theme || 0);
+  renderPlanBuilder();
   applyTheme(currentTheme);
 }
 
@@ -1366,6 +1833,111 @@ function buildThemeButtons() {
   });
 }
 
+
+function previewActivityFields(day,activity) {
+  if (activity === "service") {
+    return `
+      <div class="planning-activity-card">
+        <h3>Service</h3>
+        <div class="planning-field-grid">
+          <label>Start time<input type="time" disabled></label>
+          <label>End time<input type="time" disabled></label>
+        </div>
+        <label>
+          Meet at the Kingdom Hall?
+          <select disabled>
+            <option>Select Yes or No</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </label>
+        <label>Other meeting location or address<input type="text" disabled></label>
+        <label>Service notes<textarea disabled></textarea></label>
+      </div>
+    `;
+  }
+
+  if (activity === "meeting") {
+    return `
+      <div class="planning-activity-card">
+        <h3>Congregation Meeting</h3>
+        <div class="planning-field-grid">
+          <label>Meeting time<input type="time" disabled></label>
+          <label>Expected end time<input type="time" disabled></label>
+        </div>
+        <label>Kingdom Hall address<input type="text" disabled></label>
+        <label>Meeting notes<textarea disabled></textarea></label>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="planning-activity-card">
+      <h3>Other Plans</h3>
+      <label>Activity or plan<input type="text" disabled></label>
+      <div class="planning-field-grid">
+        <label>Start time<input type="time" disabled></label>
+        <label>End time<input type="time" disabled></label>
+      </div>
+      <label>Location<input type="text" disabled></label>
+      <label>Notes<textarea disabled></textarea></label>
+    </div>
+  `;
+}
+
+function planningPreviewMarkup(state) {
+  if (state.responseFormEnabled !== "yes") return "";
+
+  const days = selectedPlanDays(state.planConfig);
+
+  if (!days.length) {
+    return `
+      <section class="planning-preview-card">
+        <div class="planning-preview-head">
+          <h2>Weekend Details</h2>
+          <p>Select at least one day and planned activity in the builder.</p>
+        </div>
+      </section>
+    `;
+  }
+
+  const dayMarkup = days.map(day => {
+    const item = state.planConfig[day.key];
+    const activities = [
+      item.service ? previewActivityFields(day,"service") : "",
+      item.meeting ? previewActivityFields(day,"meeting") : "",
+      item.other ? previewActivityFields(day,"other") : ""
+    ].join("");
+
+    return `
+      <div class="planning-day-card">
+        <div class="planning-day-title">
+          <span>${day.label}</span>
+          <span>${escapeHtml(planDate(day.offset,state))}</span>
+        </div>
+        ${activities}
+      </div>
+    `;
+  }).join("");
+
+  return `
+    <section class="planning-preview-card">
+      <div class="planning-preview-head">
+        <h2>Help Us Complete the Plans</h2>
+        <p>${escapeHtml(state.planningIntro)}</p>
+      </div>
+
+      ${dayMarkup}
+
+      <label>Additional notes for the trip<textarea disabled></textarea></label>
+      <button class="planning-submit-preview" type="button" disabled>Submit Plan Details</button>
+      <p class="planning-calendar-note">
+        After the times are entered, either Add to Calendar button will create the selected schedule.
+      </p>
+    </section>
+  `;
+}
+
 function previewMarkup(state) {
   const art = state.showImage === "yes" ? `
     <div class="art-wrap">
@@ -1447,8 +2019,30 @@ function previewMarkup(state) {
             </div>
           </section>
 
+          ${planningPreviewMarkup(state)}
+
           <div class="closing-wrap">
             <div class="closing">${escapeHtml(state.closing)}</div>
+          </div>
+
+          <div class="bottom-calendar-wrap">
+            <div class="bottom-calendar-inner">
+              <button class="calendar-preview" type="button" data-preview-calendar-toggle>
+                📅 Add to Calendar
+              </button>
+
+              <div class="calendar-choice-menu" data-preview-calendar-menu hidden>
+                <button type="button" data-preview-device-calendar>
+                  Apple / Phone Calendar
+                  <small>Opens or downloads a standard calendar event file.</small>
+                </button>
+
+                <button type="button" data-preview-google-calendar>
+                  Google Calendar
+                  <small>Downloads the event file for Google Calendar or another compatible app.</small>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </article>
@@ -1456,24 +2050,27 @@ function previewMarkup(state) {
 }
 
 
-function sbiCalendarRuntime(eventData) {
+function sbiCalendarRuntime(runtimeConfig) {
   const script = document.currentScript;
   const root = script ? script.previousElementSibling : null;
   if (!root) return;
 
-  const toggle = root.querySelector("[data-sbi-calendar-toggle]");
-  const menu = root.querySelector("[data-sbi-calendar-menu]");
-  const deviceButton = root.querySelector("[data-sbi-device-calendar]");
-  const googleButton = root.querySelector("[data-sbi-google-calendar]");
+  const eventData = runtimeConfig.event || runtimeConfig;
+  const planData = runtimeConfig.plan || {};
+  const toggles = [...root.querySelectorAll("[data-sbi-calendar-toggle]")];
+  const menus = [...root.querySelectorAll("[data-sbi-calendar-menu]")];
   const downloadOverlay = root.querySelector("[data-sbi-download-overlay]");
   const downloadFile = root.querySelector("[data-sbi-download-file]");
   const downloadClose = root.querySelector("[data-sbi-download-close]");
+  const planForm = root.querySelector("[data-sbi-plan-form]");
+  const planFrame = root.querySelector("[data-sbi-plan-frame]");
+  const planStatus = root.querySelector("[data-sbi-plan-status]");
+  const planSubmit = root.querySelector("[data-sbi-plan-submit]");
+  const planSuccess = root.querySelector("[data-sbi-plan-success]");
 
   if (
-    !toggle ||
-    !menu ||
-    !deviceButton ||
-    !googleButton ||
+    !toggles.length ||
+    toggles.length !== menus.length ||
     !downloadOverlay ||
     !downloadFile ||
     !downloadClose
@@ -1485,20 +2082,188 @@ function sbiCalendarRuntime(eventData) {
     .replace(/,/g,"\\,")
     .replace(/;/g,"\\;");
 
-  const localDate = value => {
+  const dateForOffset = offset => {
+    if (!planData.weekStart) return "";
+
+    const parts = planData.weekStart.split("-").map(Number);
+    if (parts.length !== 3 || parts.some(value => !value)) return "";
+
+    const value = new Date(parts[0],parts[1]-1,parts[2] + offset);
+    const year = value.getFullYear();
+    const month = String(value.getMonth()+1).padStart(2,"0");
+    const date = String(value.getDate()).padStart(2,"0");
+    return `${year}-${month}-${date}`;
+  };
+
+  const localDateTime = (date,time) => {
+    if (!date || !time) return "";
+    return date.replace(/-/g,"") + "T" + time.replace(/:/g,"") + "00";
+  };
+
+  const defaultEndTime = (date,time,minutes) => {
+    if (!date || !time) return {date,time:""};
+
+    const [year,month,day] = date.split("-").map(Number);
+    const [hour,minute] = time.split(":").map(Number);
+    const value = new Date(year,month-1,day,hour,minute + minutes,0);
+
+    const endDate = [
+      value.getFullYear(),
+      String(value.getMonth()+1).padStart(2,"0"),
+      String(value.getDate()).padStart(2,"0")
+    ].join("-");
+
+    const endTime = [
+      String(value.getHours()).padStart(2,"0"),
+      String(value.getMinutes()).padStart(2,"0")
+    ].join(":");
+
+    return {date:endDate,time:endTime};
+  };
+
+  const formValue = name => {
+    if (!planForm) return "";
+    const field = planForm.elements.namedItem(name);
+    return field ? String(field.value || "").trim() : "";
+  };
+
+  const staticLocation = [eventData.venue,eventData.street,eventData.city]
+    .filter(Boolean)
+    .join(", ");
+
+  const collectPlanEvents = () => {
+    if (!planForm || !planData.enabled || !planData.planConfig) return [];
+
+    const events = [];
+    const days = [
+      {key:"monday",label:"Monday",offset:0},
+      {key:"tuesday",label:"Tuesday",offset:1},
+      {key:"wednesday",label:"Wednesday",offset:2},
+      {key:"thursday",label:"Thursday",offset:3},
+      {key:"friday",label:"Friday",offset:4},
+      {key:"saturday",label:"Saturday",offset:5},
+      {key:"sunday",label:"Sunday",offset:6}
+    ];
+
+    days.forEach(day => {
+      const config = planData.planConfig[day.key] || {};
+      if (!config.enabled) return;
+
+      const date = dateForOffset(day.offset);
+      if (!date) return;
+
+      if (config.service) {
+        const start = formValue(`${day.key}_service_start`);
+        if (start) {
+          const suppliedEnd = formValue(`${day.key}_service_end`);
+          const fallback = defaultEndTime(date,start,120);
+          const meetingChoice = formValue(`${day.key}_service_kh`);
+          const location = meetingChoice === "no"
+            ? formValue(`${day.key}_service_other_location`)
+            : staticLocation;
+
+          events.push({
+            title:`Service - ${day.label}`,
+            description:formValue(`${day.key}_service_notes`),
+            location,
+            startDate:date,
+            startTime:start,
+            endDate:suppliedEnd ? date : fallback.date,
+            endTime:suppliedEnd || fallback.time
+          });
+        }
+      }
+
+      if (config.meeting) {
+        const start = formValue(`${day.key}_meeting_start`);
+        if (start) {
+          const suppliedEnd = formValue(`${day.key}_meeting_end`);
+          const fallback = defaultEndTime(date,start,120);
+
+          events.push({
+            title:`Congregation Meeting - ${day.label}`,
+            description:formValue(`${day.key}_meeting_notes`),
+            location:formValue(`${day.key}_meeting_address`),
+            startDate:date,
+            startTime:start,
+            endDate:suppliedEnd ? date : fallback.date,
+            endTime:suppliedEnd || fallback.time
+          });
+        }
+      }
+
+      if (config.other) {
+        const start = formValue(`${day.key}_other_start`);
+        if (start) {
+          const suppliedEnd = formValue(`${day.key}_other_end`);
+          const fallback = defaultEndTime(date,start,60);
+
+          events.push({
+            title:formValue(`${day.key}_other_activity`) || `Other Plans - ${day.label}`,
+            description:formValue(`${day.key}_other_notes`),
+            location:formValue(`${day.key}_other_location`),
+            startDate:date,
+            startTime:start,
+            endDate:suppliedEnd ? date : fallback.date,
+            endTime:suppliedEnd || fallback.time
+          });
+        }
+      }
+    });
+
+    return events;
+  };
+
+  const staticEvent = () => ({
+    title:eventData.title,
+    description:eventData.description,
+    location:staticLocation,
+    startRaw:eventData.start,
+    endRaw:eventData.end
+  });
+
+  const rawLocalDate = value => {
     const compact = String(value || "").replace(/[-:]/g,"");
     if (!compact) return "";
     return compact.length === 13 ? compact + "00" : compact;
   };
 
   const buildIcs = () => {
-    const location = [eventData.venue,eventData.street,eventData.city]
-      .filter(Boolean)
-      .join(", ");
-
     const stamp = new Date().toISOString()
       .replace(/[-:]/g,"")
       .replace(/\.\d{3}Z$/,"Z");
+
+    const planEvents = collectPlanEvents();
+    const eventBlocks = [];
+
+    if (planEvents.length) {
+      planEvents.forEach((event,index) => {
+        eventBlocks.push([
+          "BEGIN:VEVENT",
+          `UID:${Date.now()}-${index}-${Math.random().toString(36).slice(2)}@small-batch-invite`,
+          `DTSTAMP:${stamp}`,
+          `DTSTART;TZID=${eventData.timezone}:${localDateTime(event.startDate,event.startTime)}`,
+          `DTEND;TZID=${eventData.timezone}:${localDateTime(event.endDate,event.endTime)}`,
+          `SUMMARY:${escapeIcs(event.title)}`,
+          `DESCRIPTION:${escapeIcs(event.description)}`,
+          `LOCATION:${escapeIcs(event.location)}`,
+          "END:VEVENT"
+        ].join("\r\n"));
+      });
+    } else {
+      const event = staticEvent();
+      eventBlocks.push([
+        "BEGIN:VEVENT",
+        `UID:${Date.now()}-${Math.random().toString(36).slice(2)}@small-batch-invite`,
+        `DTSTAMP:${stamp}`,
+        `DTSTART;TZID=${eventData.timezone}:${rawLocalDate(event.startRaw)}`,
+        `DTEND;TZID=${eventData.timezone}:${rawLocalDate(event.endRaw)}`,
+        `SUMMARY:${escapeIcs(event.title)}`,
+        `DESCRIPTION:${escapeIcs(event.description)}`,
+        `LOCATION:${escapeIcs(event.location)}`,
+        "END:VEVENT"
+      ].join("\r\n"));
+    }
 
     return [
       "BEGIN:VCALENDAR",
@@ -1506,15 +2271,7 @@ function sbiCalendarRuntime(eventData) {
       "PRODID:-//Small Batch Invite//EN",
       "CALSCALE:GREGORIAN",
       "METHOD:PUBLISH",
-      "BEGIN:VEVENT",
-      "UID:" + Date.now() + "-" + Math.random().toString(36).slice(2) + "@small-batch-invite",
-      "DTSTAMP:" + stamp,
-      "DTSTART;TZID=" + eventData.timezone + ":" + localDate(eventData.start),
-      "DTEND;TZID=" + eventData.timezone + ":" + localDate(eventData.end),
-      "SUMMARY:" + escapeIcs(eventData.title),
-      "DESCRIPTION:" + escapeIcs(eventData.description),
-      "LOCATION:" + escapeIcs(location),
-      "END:VEVENT",
+      ...eventBlocks,
       "END:VCALENDAR"
     ].join("\r\n");
   };
@@ -1550,19 +2307,30 @@ function sbiCalendarRuntime(eventData) {
     setTimeout(() => URL.revokeObjectURL(url),1500);
   };
 
-  toggle.addEventListener("click",event => {
-    event.stopPropagation();
-    menu.hidden = !menu.hidden;
-  });
+  toggles.forEach((toggle,index) => {
+    const menu = menus[index];
+    const deviceButton = menu.querySelector("[data-sbi-device-calendar]");
+    const googleButton = menu.querySelector("[data-sbi-google-calendar]");
 
-  deviceButton.addEventListener("click",() => {
-    menu.hidden = true;
-    openDeviceCalendar();
-  });
+    toggle.addEventListener("click",event => {
+      event.stopPropagation();
 
-  googleButton.addEventListener("click",() => {
-    menu.hidden = true;
-    openDeviceCalendar();
+      menus.forEach(otherMenu => {
+        if (otherMenu !== menu) otherMenu.hidden = true;
+      });
+
+      menu.hidden = !menu.hidden;
+    });
+
+    deviceButton?.addEventListener("click",() => {
+      menu.hidden = true;
+      openDeviceCalendar();
+    });
+
+    googleButton?.addEventListener("click",() => {
+      menu.hidden = true;
+      openDeviceCalendar();
+    });
   });
 
   downloadClose.addEventListener("click",closeDownloadConfirmation);
@@ -1573,22 +2341,251 @@ function sbiCalendarRuntime(eventData) {
   });
 
   document.addEventListener("click",event => {
-    if (!menu.contains(event.target) && event.target !== toggle) {
-      menu.hidden = true;
+    menus.forEach((menu,index) => {
+      const toggle = toggles[index];
+      if (!menu.contains(event.target) && event.target !== toggle) {
+        menu.hidden = true;
+      }
+    });
+  });
+
+  if (!planForm) return;
+
+  const storageKey = `small-batch-plan-${planData.inviteId || "invite"}`;
+  const savedControls = [...planForm.querySelectorAll("input,select,textarea")]
+    .filter(field => field.name && field.type !== "hidden" && field.type !== "submit");
+
+  const saveLocally = () => {
+    const saved = {};
+    savedControls.forEach(field => {
+      saved[field.name] = field.value;
+    });
+
+    try {
+      localStorage.setItem(storageKey,JSON.stringify(saved));
+    } catch {}
+  };
+
+  const restoreLocally = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
+      if (!saved) return;
+
+      savedControls.forEach(field => {
+        if (Object.prototype.hasOwnProperty.call(saved,field.name)) {
+          field.value = saved[field.name];
+        }
+      });
+    } catch {}
+  };
+
+  const updateServiceLocation = select => {
+    const day = select.dataset.sbiServiceChoice;
+    const otherWrap = root.querySelector(`[data-sbi-service-other="${day}"]`);
+    const otherInput = otherWrap ? otherWrap.querySelector("input") : null;
+    const showOther = select.value === "no";
+
+    if (otherWrap) otherWrap.hidden = !showOther;
+    if (otherInput) otherInput.required = showOther;
+  };
+
+  const makeDaySummary = (dayKey,dayLabel,config) => {
+    const lines = [];
+
+    if (config.service) {
+      const start = formValue(`${dayKey}_service_start`);
+      const end = formValue(`${dayKey}_service_end`);
+      const kh = formValue(`${dayKey}_service_kh`);
+      const otherLocation = formValue(`${dayKey}_service_other_location`);
+      const notes = formValue(`${dayKey}_service_notes`);
+      const location = kh === "yes" ? "Meet at the Kingdom Hall" : otherLocation;
+
+      lines.push([
+        "Service",
+        start ? `${start}${end ? `-${end}` : ""}` : "",
+        location,
+        notes
+      ].filter(Boolean).join(" | "));
     }
+
+    if (config.meeting) {
+      const start = formValue(`${dayKey}_meeting_start`);
+      const end = formValue(`${dayKey}_meeting_end`);
+      const address = formValue(`${dayKey}_meeting_address`);
+      const notes = formValue(`${dayKey}_meeting_notes`);
+
+      lines.push([
+        "Congregation meeting",
+        start ? `${start}${end ? `-${end}` : ""}` : "",
+        address,
+        notes
+      ].filter(Boolean).join(" | "));
+    }
+
+    if (config.other) {
+      const activity = formValue(`${dayKey}_other_activity`) || "Other";
+      const start = formValue(`${dayKey}_other_start`);
+      const end = formValue(`${dayKey}_other_end`);
+      const location = formValue(`${dayKey}_other_location`);
+      const notes = formValue(`${dayKey}_other_notes`);
+
+      lines.push([
+        activity,
+        start ? `${start}${end ? `-${end}` : ""}` : "",
+        location,
+        notes
+      ].filter(Boolean).join(" | "));
+    }
+
+    return lines.join("\n");
+  };
+
+  const prepareSubmission = () => {
+    const details = {
+      invitationId:planData.inviteId,
+      invitationLabel:planData.invitationLabel,
+      weekStart:planData.weekStart,
+      days:{},
+      generalNotes:formValue("generalNotes")
+    };
+
+    const days = [
+      {key:"monday",label:"Monday"},
+      {key:"tuesday",label:"Tuesday"},
+      {key:"wednesday",label:"Wednesday"},
+      {key:"thursday",label:"Thursday"},
+      {key:"friday",label:"Friday"},
+      {key:"saturday",label:"Saturday"},
+      {key:"sunday",label:"Sunday"}
+    ];
+
+    days.forEach(day => {
+      const config = planData.planConfig[day.key] || {};
+      const summary = config.enabled
+        ? makeDaySummary(day.key,day.label,config)
+        : "";
+
+      const summaryInput = planForm.elements.namedItem(`${day.key}Summary`);
+      if (summaryInput) summaryInput.value = summary;
+
+      details.days[day.key] = {
+        selected:Boolean(config.enabled),
+        service:Boolean(config.service),
+        meeting:Boolean(config.meeting),
+        other:Boolean(config.other),
+        summary
+      };
+    });
+
+    const detailsInput = planForm.elements.namedItem("detailsJson");
+    if (detailsInput) detailsInput.value = JSON.stringify(details);
+  };
+
+  restoreLocally();
+
+  root.querySelectorAll("[data-sbi-service-choice]").forEach(select => {
+    updateServiceLocation(select);
+    select.addEventListener("change",() => {
+      updateServiceLocation(select);
+      saveLocally();
+    });
+  });
+
+  savedControls.forEach(field => {
+    field.addEventListener("input",saveLocally);
+    field.addEventListener("change",saveLocally);
+  });
+
+  let submissionTimer = null;
+
+  const showPlanMessage = (type,message) => {
+    if (!planStatus) return;
+    planStatus.className = `sbi-plan-status ${type}`;
+    planStatus.textContent = message;
+  };
+
+  const handleSubmissionMessage = event => {
+    if (!planFrame || event.source !== planFrame.contentWindow) return;
+    const data = event.data;
+
+    if (
+      !data ||
+      data.source !== "small-batch-invite-response" ||
+      data.inviteId !== planData.inviteId
+    ) return;
+
+    clearTimeout(submissionTimer);
+    planSubmit.disabled = false;
+    planSubmit.textContent = "Update Plan Details";
+
+    if (data.ok) {
+      showPlanMessage("success",data.message || "Your plan details were submitted successfully.");
+      if (planSuccess) planSuccess.hidden = false;
+      saveLocally();
+    } else {
+      showPlanMessage("error",data.message || "The details could not be submitted.");
+    }
+  };
+
+  window.addEventListener("message",handleSubmissionMessage);
+
+  planForm.addEventListener("submit",event => {
+    event.preventDefault();
+
+    if (!planData.endpoint) {
+      showPlanMessage(
+        "error",
+        "The sender still needs to connect this invitation to the private response sheet."
+      );
+      return;
+    }
+
+    if (!planForm.reportValidity()) return;
+
+    prepareSubmission();
+    saveLocally();
+
+    planSubmit.disabled = true;
+    planSubmit.textContent = "Submitting…";
+    showPlanMessage("working","Submitting your plan details…");
+
+    planForm.action = planData.endpoint;
+    planForm.target = planFrame.name;
+    HTMLFormElement.prototype.submit.call(planForm);
+
+    clearTimeout(submissionTimer);
+    submissionTimer = setTimeout(() => {
+      planSubmit.disabled = false;
+      planSubmit.textContent = "Submit Plan Details";
+      showPlanMessage(
+        "error",
+        "The submission is taking longer than expected. Check your connection and try again."
+      );
+    },25000);
   });
 }
 
 function calendarEmbedScript(state) {
-  const eventData = {
-    title: state.calendarTitle || state.title,
-    description: state.calendarDescription || state.message,
-    venue: state.venueName,
-    street: state.streetAddress,
-    city: state.cityStateZip,
-    start: state.startDateTime,
-    end: state.endDateTime,
-    timezone: state.timezone || "America/Phoenix"
+  const runtimeConfig = {
+    event:{
+      title:state.calendarTitle || state.title,
+      description:state.calendarDescription || state.message,
+      venue:state.venueName,
+      street:state.streetAddress,
+      city:state.cityStateZip,
+      start:state.startDateTime,
+      end:state.endDateTime,
+      timezone:state.timezone || "America/Phoenix"
+    },
+    plan:{
+      enabled:state.responseFormEnabled === "yes",
+      endpoint:state.responseEndpoint,
+      invitationLabel:state.invitationLabel,
+      inviteId:state.invitationId,
+      inviteToken:state.invitationToken,
+      weekStart:state.planWeekStart,
+      planConfig:state.planConfig
+    }
   };
 
   // Splitting the closing tag prevents the browser from ending this app's
@@ -1596,9 +2593,227 @@ function calendarEmbedScript(state) {
   return "<script>(" +
     sbiCalendarRuntime.toString() +
     ")(" +
-    JSON.stringify(eventData) +
+    JSON.stringify(runtimeConfig) +
     ");</scr" +
     "ipt>";
+}
+
+
+function formFieldName(day,activity,field) {
+  return `${day.key}_${activity}_${field}`;
+}
+
+function recipientActivityMarkup(day,activity) {
+  if (activity === "service") {
+    return `
+      <div class="sbi-plan-activity">
+        <h3>Service</h3>
+
+        <div class="sbi-plan-grid">
+          <label>
+            Start time
+            <input type="time" name="${formFieldName(day,"service","start")}" required>
+          </label>
+          <label>
+            End time
+            <input type="time" name="${formFieldName(day,"service","end")}">
+          </label>
+        </div>
+
+        <label>
+          Meet at the Kingdom Hall?
+          <select
+            name="${formFieldName(day,"service","kh")}"
+            data-sbi-service-choice="${day.key}"
+            required
+          >
+            <option value="">Select Yes or No</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </label>
+
+        <label data-sbi-service-other="${day.key}" hidden>
+          Other meeting location or address
+          <input type="text" name="${formFieldName(day,"service","other_location")}">
+        </label>
+
+        <label>
+          Service notes
+          <textarea
+            name="${formFieldName(day,"service","notes")}"
+            placeholder="Anything helpful about the service plans"
+          ></textarea>
+        </label>
+      </div>
+    `;
+  }
+
+  if (activity === "meeting") {
+    return `
+      <div class="sbi-plan-activity">
+        <h3>Congregation Meeting</h3>
+
+        <div class="sbi-plan-grid">
+          <label>
+            Meeting time
+            <input type="time" name="${formFieldName(day,"meeting","start")}" required>
+          </label>
+          <label>
+            Expected end time
+            <input type="time" name="${formFieldName(day,"meeting","end")}">
+          </label>
+        </div>
+
+        <label>
+          Kingdom Hall address
+          <input
+            type="text"
+            name="${formFieldName(day,"meeting","address")}"
+            placeholder="Street address, city and state"
+            required
+          >
+        </label>
+
+        <label>
+          Meeting notes
+          <textarea
+            name="${formFieldName(day,"meeting","notes")}"
+            placeholder="Meeting details or anything we should know"
+          ></textarea>
+        </label>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="sbi-plan-activity">
+      <h3>Other Plans</h3>
+
+      <label>
+        Activity or plan
+        <input type="text" name="${formFieldName(day,"other","activity")}" required>
+      </label>
+
+      <div class="sbi-plan-grid">
+        <label>
+          Start time
+          <input type="time" name="${formFieldName(day,"other","start")}" required>
+        </label>
+        <label>
+          End time
+          <input type="time" name="${formFieldName(day,"other","end")}">
+        </label>
+      </div>
+
+      <label>
+        Location
+        <input type="text" name="${formFieldName(day,"other","location")}">
+      </label>
+
+      <label>
+        Notes
+        <textarea name="${formFieldName(day,"other","notes")}"></textarea>
+      </label>
+    </div>
+  `;
+}
+
+function recipientPlanningMarkup(state) {
+  if (state.responseFormEnabled !== "yes") return "";
+
+  const days = selectedPlanDays(state.planConfig);
+  if (!days.length) return "";
+
+  const safeId = (state.invitationId || "invite").replace(/[^a-z0-9_-]/gi,"-");
+  const frameName = `sbi-plan-frame-${safeId}`;
+
+  const daysMarkup = days.map(day => {
+    const item = state.planConfig[day.key];
+    const activities = [
+      item.service ? recipientActivityMarkup(day,"service") : "",
+      item.meeting ? recipientActivityMarkup(day,"meeting") : "",
+      item.other ? recipientActivityMarkup(day,"other") : ""
+    ].join("");
+
+    return `
+      <section class="sbi-plan-day">
+        <div class="sbi-plan-day-title">
+          <span>${day.label}</span>
+          <span>${escapeHtml(planDate(day.offset,state))}</span>
+        </div>
+        ${activities}
+      </section>
+    `;
+  }).join("");
+
+  const summaryInputs = PLAN_DAYS.map(day =>
+    `<input type="hidden" name="${day.key}Summary">`
+  ).join("");
+
+  return `
+    <section class="sbi-planning">
+      <div class="sbi-planning-head">
+        <span class="sbi-planning-icon">🗓️</span>
+        <div>
+          <h2>Help Us Complete the Plans</h2>
+          <p>${escapeHtml(state.planningIntro)}</p>
+        </div>
+      </div>
+
+      <form
+        class="sbi-plan-form"
+        method="post"
+        action="${escapeHtml(state.responseEndpoint)}"
+        target="${escapeHtml(frameName)}"
+        data-sbi-plan-form
+      >
+        <input type="hidden" name="inviteId" value="${escapeHtml(state.invitationId)}">
+        <input type="hidden" name="inviteToken" value="${escapeHtml(state.invitationToken)}">
+        <input type="hidden" name="invitationLabel" value="${escapeHtml(state.invitationLabel)}">
+        <input type="hidden" name="weekStart" value="${escapeHtml(state.planWeekStart)}">
+        <input
+          type="hidden"
+          name="planConfigJson"
+          value="${escapeHtml(JSON.stringify(state.planConfig))}"
+        >
+        <input type="hidden" name="detailsJson">
+        ${summaryInputs}
+
+        ${daysMarkup}
+
+        <label class="sbi-general-notes">
+          Additional notes for the trip
+          <textarea
+            name="generalNotes"
+            placeholder="Travel, lodging, clothing, meals or anything else that may be helpful"
+          ></textarea>
+        </label>
+
+        <button class="sbi-plan-submit" type="submit" data-sbi-plan-submit>
+          Submit Plan Details
+        </button>
+
+        <div class="sbi-plan-status" data-sbi-plan-status aria-live="polite"></div>
+
+        <div class="sbi-plan-success" data-sbi-plan-success hidden>
+          <strong>Thank you!</strong>
+          Your details have been saved. You can make changes and submit again if needed.
+        </div>
+
+        <p class="sbi-plan-calendar-note">
+          Once the times are filled in, either Add to Calendar button will download the selected schedule.
+        </p>
+      </form>
+
+      <iframe
+        name="${escapeHtml(frameName)}"
+        data-sbi-plan-frame
+        title="Plan submission response"
+        hidden
+      ></iframe>
+    </section>
+  `;
 }
 
 function embedCode(state) {
@@ -2060,6 +3275,200 @@ function embedCode(state) {
   line-height:1.55;
 }
 
+.sbi-bottom-calendar {
+  position:relative;
+  z-index:8;
+  display:flex;
+  justify-content:center;
+  padding:0 24px 34px;
+}
+
+.sbi-bottom-calendar-inner {
+  position:relative;
+}
+
+.sbi-bottom-calendar .sbi-calendar-menu {
+  top:auto;
+  bottom:calc(100% + 9px);
+  left:50%;
+  right:auto;
+  transform:translateX(-50%);
+}
+
+.sbi-planning {
+  margin:0 38px 30px;
+  padding:24px;
+  border:1px solid rgba(168,73,112,.15);
+  border-radius:28px;
+  background:linear-gradient(145deg,rgba(255,255,255,.94),rgba(250,244,255,.9));
+  box-shadow:0 14px 30px rgba(91,57,72,.08);
+}
+
+.sbi-planning-head {
+  display:flex;
+  align-items:center;
+  gap:13px;
+  margin-bottom:18px;
+}
+
+.sbi-planning-icon {
+  width:48px;
+  height:48px;
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  border-radius:16px;
+  background:linear-gradient(135deg,var(--sbi-soft),var(--sbi-soft2));
+  font-size:1.35rem;
+}
+
+.sbi-planning-head h2 {
+  margin:0 0 5px !important;
+  color:var(--sbi-accent) !important;
+  font-family:"Playfair Display",serif !important;
+  font-size:1.5rem !important;
+  line-height:1.15 !important;
+}
+
+.sbi-planning-head p {
+  margin:0 !important;
+  color:var(--sbi-muted) !important;
+  line-height:1.5 !important;
+}
+
+.sbi-plan-day {
+  margin-top:13px;
+  padding:17px;
+  border:1px solid rgba(168,73,112,.13);
+  border-radius:20px;
+  background:rgba(255,255,255,.83);
+}
+
+.sbi-plan-day-title {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:13px;
+  color:var(--sbi-accent);
+  font-weight:900;
+}
+
+.sbi-plan-day-title span:last-child {
+  color:var(--sbi-muted);
+  font-size:.79rem;
+}
+
+.sbi-plan-activity {
+  margin-top:10px;
+  padding:14px;
+  border-radius:16px;
+  background:linear-gradient(135deg,var(--sbi-soft),rgba(255,255,255,.94));
+}
+
+.sbi-plan-activity h3 {
+  margin:0 0 11px !important;
+  color:var(--sbi-ink) !important;
+  font-size:.98rem !important;
+}
+
+.sbi-plan-form label {
+  display:block;
+  margin:10px 0 0;
+  color:var(--sbi-ink);
+  font-size:.82rem;
+  font-weight:800;
+}
+
+.sbi-plan-form input,
+.sbi-plan-form select,
+.sbi-plan-form textarea {
+  width:100%;
+  margin-top:6px;
+  border:1px solid rgba(111,77,93,.18);
+  border-radius:12px;
+  padding:11px 12px;
+  color:var(--sbi-ink);
+  background:white;
+  font:inherit;
+  outline:none;
+}
+
+.sbi-plan-form input:focus,
+.sbi-plan-form select:focus,
+.sbi-plan-form textarea:focus {
+  border-color:var(--sbi-accent);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--sbi-accent) 14%,transparent);
+}
+
+.sbi-plan-form textarea {
+  min-height:82px;
+  resize:vertical;
+}
+
+.sbi-plan-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.sbi-general-notes {
+  margin-top:18px !important;
+}
+
+.sbi-plan-submit {
+  width:100%;
+  margin-top:18px;
+  border:0;
+  border-radius:999px;
+  padding:13px 18px;
+  color:white;
+  background:linear-gradient(135deg,var(--sbi-accent),var(--sbi-accent2));
+  box-shadow:0 12px 24px rgba(97,64,80,.15);
+  font:inherit;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.sbi-plan-submit:disabled {
+  cursor:wait;
+  opacity:.65;
+}
+
+.sbi-plan-status {
+  min-height:22px;
+  margin-top:10px;
+  font-size:.82rem;
+  font-weight:800;
+  text-align:center;
+}
+
+.sbi-plan-status.success { color:#467052; }
+.sbi-plan-status.error { color:#a53f4f; }
+.sbi-plan-status.working { color:var(--sbi-muted); }
+
+.sbi-plan-success {
+  margin-top:12px;
+  padding:13px;
+  border-radius:14px;
+  color:#3f6549;
+  background:#edf7ef;
+  line-height:1.5;
+  text-align:center;
+}
+
+.sbi-plan-success[hidden] {
+  display:none;
+}
+
+.sbi-plan-calendar-note {
+  margin:12px 0 0 !important;
+  color:var(--sbi-muted) !important;
+  font-size:.78rem !important;
+  line-height:1.5 !important;
+  text-align:center;
+}
+
 @media (max-width:760px) {
   .sbi-invite { padding:10px; }
   .sbi-card { padding:10px;border-radius:30px; }
@@ -2112,6 +3521,8 @@ function embedCode(state) {
   .sbi-detail-label { grid-area:label;margin-top:3px; }
   .sbi-detail-value { grid-area:value; }
   .sbi-closing-wrap { padding:0 20px 28px; }
+  .sbi-planning { margin:0 20px 26px;padding:18px; }
+  .sbi-plan-grid { grid-template-columns:1fr; }
 }
 </style>
 
@@ -2185,8 +3596,30 @@ function embedCode(state) {
           </div>
         </div>
 
+        ${recipientPlanningMarkup(state)}
+
         <div class="sbi-closing-wrap">
           <div class="sbi-closing">${escapeHtml(state.closing)}</div>
+        </div>
+
+        <div class="sbi-bottom-calendar">
+          <div class="sbi-bottom-calendar-inner">
+            <button class="sbi-calendar" type="button" data-sbi-calendar-toggle>
+              📅 Add to Calendar
+            </button>
+
+            <div class="sbi-calendar-menu" data-sbi-calendar-menu hidden>
+              <button type="button" data-sbi-device-calendar>
+                Apple / Phone Calendar
+                <small>Opens or downloads a standard calendar event file.</small>
+              </button>
+
+              <button type="button" data-sbi-google-calendar>
+                Google Calendar
+                <small>Downloads the event file for Google Calendar or another compatible app.</small>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </article>
@@ -2213,36 +3646,49 @@ ${calendarEmbedScript(state)}
 
 function render() {
   const state = readState();
+  renderPlanBuilder();
   preview.innerHTML = previewMarkup(state);
   updateImageStatus();
 
-  const previewToggle = preview.querySelector("[data-preview-calendar-toggle]");
-  const previewMenu = preview.querySelector("[data-preview-calendar-menu]");
-  const previewDevice = preview.querySelector("[data-preview-device-calendar]");
-  const previewGoogle = preview.querySelector("[data-preview-google-calendar]");
+  const previewToggles = [...preview.querySelectorAll("[data-preview-calendar-toggle]")];
+  const previewMenus = [...preview.querySelectorAll("[data-preview-calendar-menu]")];
 
-  if (previewToggle && previewMenu) {
-    previewToggle.addEventListener("click",event => {
+  previewToggles.forEach((toggle,index) => {
+    const menu = previewMenus[index];
+    if (!menu) return;
+
+    const deviceButton = menu.querySelector("[data-preview-device-calendar]");
+    const googleButton = menu.querySelector("[data-preview-google-calendar]");
+
+    toggle.addEventListener("click",event => {
       event.stopPropagation();
-      previewMenu.hidden = !previewMenu.hidden;
+
+      previewMenus.forEach(otherMenu => {
+        if (otherMenu !== menu) otherMenu.hidden = true;
+      });
+
+      menu.hidden = !menu.hidden;
     });
 
-    previewDevice?.addEventListener("click",() => {
-      previewMenu.hidden = true;
+    deviceButton?.addEventListener("click",() => {
+      menu.hidden = true;
       openDeviceCalendar(state);
     });
 
-    previewGoogle?.addEventListener("click",() => {
-      previewMenu.hidden = true;
+    googleButton?.addEventListener("click",() => {
+      menu.hidden = true;
       openDeviceCalendar(state);
     });
+  });
 
-    document.addEventListener("click",event => {
-      if (!previewMenu.contains(event.target) && event.target !== previewToggle) {
-        previewMenu.hidden = true;
+  document.addEventListener("click",event => {
+    previewMenus.forEach((menu,index) => {
+      const toggle = previewToggles[index];
+      if (!menu.contains(event.target) && event.target !== toggle) {
+        menu.hidden = true;
       }
-    },{once:true});
-  }
+    });
+  },{once:true});
 
   if (codePanel.classList.contains("show")) {
     codeBox.value = embedCode(state);
@@ -2290,8 +3736,62 @@ function showCode(selectAll=false) {
   }
 }
 
+
+function validatePlanningSetup(state) {
+  if (state.responseFormEnabled !== "yes") return true;
+
+  if (!state.invitationLabel.trim()) {
+    notify(
+      "error",
+      "Add a private invitation label",
+      "Use a label such as Sedona Weekend - Smiths so you can recognize the row in your response sheet."
+    );
+    return false;
+  }
+
+  if (!state.planWeekStart) {
+    notify(
+      "error",
+      "Choose the Monday date",
+      "The invitation needs the week-starting date so each selected day has the correct calendar date."
+    );
+    return false;
+  }
+
+  if (!state.responseEndpoint.trim()) {
+    notify(
+      "error",
+      "Connect the response sheet",
+      "Paste the deployed Google Apps Script /exec URL into the Recipient Planning Form section."
+    );
+    return false;
+  }
+
+  if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec(?:\?.*)?$/i.test(state.responseEndpoint.trim())) {
+    notify(
+      "error",
+      "Use the deployed Apps Script URL",
+      "The response URL should begin with https://script.google.com/macros/s/ and end with /exec."
+    );
+    return false;
+  }
+
+  if (!selectedPlanDays(state.planConfig).length) {
+    notify(
+      "error",
+      "Choose at least one planned activity",
+      "Select a day and choose Service, Congregation meeting or Other."
+    );
+    return false;
+  }
+
+  return true;
+}
+
 async function copyEmbedCode() {
   const state = readState();
+
+  if (!validatePlanningSetup(state)) return;
 
   if (!isHosted() && state.showImage === "yes" && !uploadedImageData) {
     showCode(false);
@@ -2342,6 +3842,8 @@ async function copyEmbedCode() {
 
 function downloadCode() {
   const state = readState();
+
+  if (!validatePlanningSetup(state)) return;
 
   if (!isHosted() && state.showImage === "yes" && !uploadedImageData) {
     notify(
@@ -2493,9 +3995,14 @@ function resetApp() {
     localStorage.removeItem("smallBatchInviteStudio.uploadedImageName");
   } catch {}
 
-  writeState(DEFAULTS);
+  const identity = generateInvitationIdentity();
+  writeState({
+    ...DEFAULTS,
+    invitationId:identity.id,
+    invitationToken:identity.token
+  });
   render();
-  notify("info","Invite reset","The Service Plans defaults and built-in chibis have been restored.");
+  notify("info","Invite reset","The Service Plans defaults and a fresh invitation ID have been restored.");
 }
 
 function applyTemplate(name) {
@@ -2509,6 +4016,29 @@ function applyTemplate(name) {
   fields.closing.value = template.closing;
   fields.calendarTitle.value = template.calendarTitle;
   fields.calendarDescription.value = template.calendarDescription;
+
+  [
+    "dateDisplay","timeDisplay","venueName","streetAddress","cityStateZip",
+    "mapsUrl","responseFormEnabled","invitationLabel","planningIntro"
+  ].forEach(id => {
+    if (Object.prototype.hasOwnProperty.call(template,id)) {
+      fields[id].value = template[id];
+    }
+  });
+
+  if (template.planConfig) {
+    planConfig = normalizePlanConfig(template.planConfig);
+  } else if (name !== "serviceTrip") {
+    fields.responseFormEnabled.value = "no";
+  }
+
+  if (name === "serviceTrip") {
+    const identity = generateInvitationIdentity();
+    fields.invitationId.value = identity.id;
+    fields.invitationToken.value = identity.token;
+  }
+
+  renderPlanBuilder();
   render();
 }
 
@@ -2521,7 +4051,13 @@ try {
   uploadedImageName = localStorage.getItem("smallBatchInviteStudio.uploadedImageName") || "";
 } catch {}
 
-writeState({...DEFAULTS,...(savedState || {})});
+const initialIdentity = generateInvitationIdentity();
+writeState({
+  ...DEFAULTS,
+  invitationId:initialIdentity.id,
+  invitationToken:initialIdentity.token,
+  ...(savedState || {})
+});
 hostingWarning.classList.toggle("show",!isHosted());
 
 Object.values(fields).forEach(field => {
@@ -2530,6 +4066,38 @@ Object.values(fields).forEach(field => {
 });
 
 fields.template.addEventListener("change",event => applyTemplate(event.target.value));
+
+planBuilder.addEventListener("change",event => {
+  const dayKey = event.target.dataset.planDay;
+  const activityDay = event.target.dataset.planActivityDay;
+  const activity = event.target.dataset.planActivity;
+
+  if (dayKey) {
+    planConfig[dayKey].enabled = event.target.checked;
+  }
+
+  if (activityDay && activity) {
+    planConfig[activityDay][activity] = event.target.checked;
+    if (event.target.checked) {
+      planConfig[activityDay].enabled = true;
+    }
+  }
+
+  renderPlanBuilder();
+  render();
+});
+
+document.getElementById("newInviteIdBtn").addEventListener("click",() => {
+  const identity = generateInvitationIdentity();
+  fields.invitationId.value = identity.id;
+  fields.invitationToken.value = identity.token;
+  render();
+  notify(
+    "success",
+    "New invitation ID created",
+    "This invitation will create a separate response row from earlier invitations."
+  );
+});
 
 document.getElementById("copyBtn").addEventListener("click",copyEmbedCode);
 document.getElementById("showCodeBtn").addEventListener("click",() => {
