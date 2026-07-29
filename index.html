@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8dce7">
-  <meta name="app-build" content="single-closed-form-confirmation-15">
+  <meta name="app-build" content="top-calendar-only-16">
   <title>Small Batch Invite Studio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -819,26 +819,6 @@
       line-height:1.55;
     }
 
-    .bottom-calendar-wrap {
-      position:relative;
-      z-index:8;
-      display:flex;
-      justify-content:center;
-      padding:0 24px 34px;
-    }
-
-    .bottom-calendar-inner {
-      position:relative;
-    }
-
-    .bottom-calendar-wrap .calendar-choice-menu {
-      top:auto;
-      bottom:calc(100% + 9px);
-      left:50%;
-      right:auto;
-      transform:translateX(-50%);
-    }
-
     .planning-setup-note {
       margin:0 0 12px;
       padding:11px 12px;
@@ -1101,7 +1081,7 @@
         position:static;
         display:flex;
         justify-content:center;
-        padding:14px 12px 0;
+        padding:14px 12px 8px;
       }
 
       .calendar-choice-menu {
@@ -2176,26 +2156,6 @@ function previewMarkup(state) {
 
           <div class="closing-wrap">
             <div class="closing">${escapeHtml(state.closing)}</div>
-          </div>
-
-          <div class="bottom-calendar-wrap">
-            <div class="bottom-calendar-inner">
-              <button class="calendar-preview" type="button" data-preview-calendar-toggle>
-                📅 Add to Calendar
-              </button>
-
-              <div class="calendar-choice-menu" data-preview-calendar-menu hidden>
-                <button type="button" data-preview-device-calendar>
-                  Apple / Phone Calendar
-                  <small>Opens or downloads a standard calendar event file.</small>
-                </button>
-
-                <button type="button" data-preview-google-calendar>
-                  Google Calendar
-                  <small>Downloads the event file for Google Calendar or another compatible app.</small>
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </article>
@@ -3523,26 +3483,6 @@ function embedCode(state) {
   line-height:1.55;
 }
 
-.sbi-bottom-calendar {
-  position:relative;
-  z-index:8;
-  display:flex;
-  justify-content:center;
-  padding:0 24px 34px;
-}
-
-.sbi-bottom-calendar-inner {
-  position:relative;
-}
-
-.sbi-bottom-calendar .sbi-calendar-menu {
-  top:auto;
-  bottom:calc(100% + 9px);
-  left:50%;
-  right:auto;
-  transform:translateX(-50%);
-}
-
 .sbi-planning {
   margin:0 38px 30px;
   padding:24px;
@@ -3814,7 +3754,7 @@ function embedCode(state) {
     position:static;
     display:flex;
     justify-content:center;
-    padding:14px 12px 0;
+    padding:14px 12px 8px;
   }
 
   .sbi-calendar-menu {
@@ -3943,10 +3883,6 @@ function embedCode(state) {
   .sbi-closing-wrap {
     padding:0 12px 24px;
   }
-
-  .sbi-bottom-calendar {
-    padding:0 12px 28px;
-  }
 }
 
 @media (max-width:420px) {
@@ -4061,26 +3997,6 @@ function embedCode(state) {
 
         <div class="sbi-closing-wrap">
           <div class="sbi-closing">${escapeHtml(state.closing)}</div>
-        </div>
-
-        <div class="sbi-bottom-calendar">
-          <div class="sbi-bottom-calendar-inner">
-            <button class="sbi-calendar" type="button" data-sbi-calendar-toggle>
-              📅 Add to Calendar
-            </button>
-
-            <div class="sbi-calendar-menu" data-sbi-calendar-menu hidden>
-              <button type="button" data-sbi-device-calendar>
-                Apple / Phone Calendar
-                <small>Opens or downloads a standard calendar event file.</small>
-              </button>
-
-              <button type="button" data-sbi-google-calendar>
-                Google Calendar
-                <small>Downloads the event file for Google Calendar or another compatible app.</small>
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </article>
