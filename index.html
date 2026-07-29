@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8dce7">
-  <meta name="app-build" content="custom-success-message-14">
+  <meta name="app-build" content="single-closed-form-confirmation-15">
   <title>Small Batch Invite Studio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2696,12 +2696,27 @@ function sbiCalendarRuntime(runtimeConfig) {
 
     planSubmit.disabled = false;
     planSubmit.textContent = "Update Times and Locations";
-    showPlanMessage(
-      "success",
-      message || "Thank you for filling out the times and Locations, we'll see you in soon!"
-    );
 
-    if (planSuccess) planSuccess.hidden = false;
+    if (planStatus) {
+      planStatus.className = "sbi-plan-status";
+      planStatus.textContent = "";
+    }
+
+    planForm.hidden = true;
+
+    if (planSuccess) {
+      planSuccess.hidden = false;
+      planSuccess.textContent =
+        message || "Thank you for filling out the times and Locations, we'll see you in soon!";
+
+      setTimeout(() => {
+        planSuccess.scrollIntoView({
+          behavior:"smooth",
+          block:"center"
+        });
+      },100);
+    }
+
     saveLocally();
   };
 
@@ -2717,7 +2732,7 @@ function sbiCalendarRuntime(runtimeConfig) {
 
     if (data.ok) {
       confirmSuccessfulSubmission(
-        data.message || "Thank you for filling out the times and Locations, we'll see you in soon!"
+        "Thank you for filling out the times and Locations, we'll see you in soon!"
       );
     } else {
       submissionPending = false;
@@ -3022,15 +3037,14 @@ function recipientPlanningMarkup(state) {
 
         <div class="sbi-plan-status" data-sbi-plan-status aria-live="polite"></div>
 
-        <div class="sbi-plan-success" data-sbi-plan-success hidden>
-          <strong>Thank you!</strong>
-          Thank you for filling out the times and Locations, we'll see you in soon!
-        </div>
-
         <p class="sbi-plan-calendar-note">
           After you submit the times, you can press the Add to Calendar button to add it to your device’s calendar!
         </p>
       </form>
+
+      <div class="sbi-plan-success" data-sbi-plan-success hidden>
+        Thank you for filling out the times and Locations, we'll see you in soon!
+      </div>
 
       <iframe
         name="${escapeHtml(frameName)}"
@@ -3740,6 +3754,10 @@ function embedCode(state) {
   opacity:.65;
 }
 
+.sbi-plan-form[hidden] {
+  display:none !important;
+}
+
 .sbi-plan-status {
   min-height:22px;
   margin-top:10px;
@@ -3753,12 +3771,16 @@ function embedCode(state) {
 .sbi-plan-status.working { color:var(--sbi-muted); }
 
 .sbi-plan-success {
-  margin-top:12px;
-  padding:13px;
-  border-radius:14px;
+  margin:8px 0 0;
+  padding:22px 18px;
+  border:1px solid rgba(70,112,82,.18);
+  border-radius:18px;
   color:#3f6549;
-  background:#edf7ef;
-  line-height:1.5;
+  background:linear-gradient(135deg,#edf7ef,#f6fbf7);
+  box-shadow:0 12px 26px rgba(63,101,73,.08);
+  font-size:1rem;
+  font-weight:800;
+  line-height:1.55;
   text-align:center;
 }
 
