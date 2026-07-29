@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8dce7">
-  <meta name="app-build" content="recipient-planning-form-8">
+  <meta name="app-build" content="recipient-form-polish-9">
   <title>Small Batch Invite Studio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -990,6 +990,10 @@
       gap:10px;
     }
 
+    .planning-preview-card [hidden] {
+      display:none !important;
+    }
+
     .planning-preview-card input,
     .planning-preview-card select,
     .planning-preview-card textarea {
@@ -1851,7 +1855,7 @@ function previewActivityFields(day,activity) {
             <option>No</option>
           </select>
         </label>
-        <label>Other meeting location or address<input type="text" disabled></label>
+        <label hidden>Other meeting location or address<input type="text" disabled></label>
         <label>Service notes<textarea disabled></textarea></label>
       </div>
     `;
@@ -1861,10 +1865,7 @@ function previewActivityFields(day,activity) {
     return `
       <div class="planning-activity-card">
         <h3>Congregation Meeting</h3>
-        <div class="planning-field-grid">
-          <label>Meeting time<input type="time" disabled></label>
-          <label>Expected end time<input type="time" disabled></label>
-        </div>
+        <label>Meeting time<input type="time" disabled></label>
         <label>Kingdom Hall address<input type="text" disabled></label>
         <label>Meeting notes<textarea disabled></textarea></label>
       </div>
@@ -1930,9 +1931,9 @@ function planningPreviewMarkup(state) {
       ${dayMarkup}
 
       <label>Additional notes for the trip<textarea disabled></textarea></label>
-      <button class="planning-submit-preview" type="button" disabled>Submit Plan Details</button>
+      <button class="planning-submit-preview" type="button" disabled>Submit Times and Locations</button>
       <p class="planning-calendar-note">
-        After the times are entered, either Add to Calendar button will create the selected schedule.
+        After you submit the times, you can press the Add to Calendar button to add it to your device’s calendar!
       </p>
     </section>
   `;
@@ -1986,14 +1987,17 @@ function previewMarkup(state) {
               <span class="host-line">${escapeHtml(state.hostLine)}</span>
               <p class="preview-message">${escapeHtml(state.message)}</p>
 
+              ${state.responseFormEnabled === "yes" ? "" : `
               <div class="date-ribbon">
                 <span><strong>${escapeHtml(state.dateDisplay)}</strong></span>
                 <span>${escapeHtml(state.timeDisplay)}</span>
               </div>
+              `}
             </div>
             ${art}
           </section>
 
+          ${state.responseFormEnabled === "yes" ? "" : `
           <section class="preview-details">
             <div class="preview-detail">
               <div class="detail-icon">📅</div>
@@ -2018,6 +2022,7 @@ function previewMarkup(state) {
               </div>
             </div>
           </section>
+          `}
 
           ${planningPreviewMarkup(state)}
 
@@ -2177,7 +2182,6 @@ function sbiCalendarRuntime(runtimeConfig) {
       if (config.meeting) {
         const start = formValue(`${day.key}_meeting_start`);
         if (start) {
-          const suppliedEnd = formValue(`${day.key}_meeting_end`);
           const fallback = defaultEndTime(date,start,120);
 
           events.push({
@@ -2186,8 +2190,8 @@ function sbiCalendarRuntime(runtimeConfig) {
             location:formValue(`${day.key}_meeting_address`),
             startDate:date,
             startTime:start,
-            endDate:suppliedEnd ? date : fallback.date,
-            endTime:suppliedEnd || fallback.time
+            endDate:fallback.date,
+            endTime:fallback.time
           });
         }
       }
@@ -2410,13 +2414,12 @@ function sbiCalendarRuntime(runtimeConfig) {
 
     if (config.meeting) {
       const start = formValue(`${dayKey}_meeting_start`);
-      const end = formValue(`${dayKey}_meeting_end`);
       const address = formValue(`${dayKey}_meeting_address`);
       const notes = formValue(`${dayKey}_meeting_notes`);
 
       lines.push([
         "Congregation meeting",
-        start ? `${start}${end ? `-${end}` : ""}` : "",
+        start,
         address,
         notes
       ].filter(Boolean).join(" | "));
@@ -2516,7 +2519,7 @@ function sbiCalendarRuntime(runtimeConfig) {
 
     clearTimeout(submissionTimer);
     planSubmit.disabled = false;
-    planSubmit.textContent = "Update Plan Details";
+    planSubmit.textContent = "Update Times and Locations";
 
     if (data.ok) {
       showPlanMessage("success",data.message || "Your plan details were submitted successfully.");
@@ -2556,7 +2559,7 @@ function sbiCalendarRuntime(runtimeConfig) {
     clearTimeout(submissionTimer);
     submissionTimer = setTimeout(() => {
       planSubmit.disabled = false;
-      planSubmit.textContent = "Submit Plan Details";
+      planSubmit.textContent = "Submit Times and Locations";
       showPlanMessage(
         "error",
         "The submission is taking longer than expected. Check your connection and try again."
@@ -2654,16 +2657,10 @@ function recipientActivityMarkup(day,activity) {
       <div class="sbi-plan-activity">
         <h3>Congregation Meeting</h3>
 
-        <div class="sbi-plan-grid">
-          <label>
-            Meeting time
-            <input type="time" name="${formFieldName(day,"meeting","start")}" required>
-          </label>
-          <label>
-            Expected end time
-            <input type="time" name="${formFieldName(day,"meeting","end")}">
-          </label>
-        </div>
+        <label>
+          Meeting time
+          <input type="time" name="${formFieldName(day,"meeting","start")}" required>
+        </label>
 
         <label>
           Kingdom Hall address
@@ -2791,7 +2788,7 @@ function recipientPlanningMarkup(state) {
         </label>
 
         <button class="sbi-plan-submit" type="submit" data-sbi-plan-submit>
-          Submit Plan Details
+          Submit Times and Locations
         </button>
 
         <div class="sbi-plan-status" data-sbi-plan-status aria-live="polite"></div>
@@ -2802,7 +2799,7 @@ function recipientPlanningMarkup(state) {
         </div>
 
         <p class="sbi-plan-calendar-note">
-          Once the times are filled in, either Add to Calendar button will download the selected schedule.
+          After you submit the times, you can press the Add to Calendar button to add it to your device’s calendar!
         </p>
       </form>
 
@@ -3380,6 +3377,10 @@ function embedCode(state) {
   font-weight:800;
 }
 
+.sbi-plan-form [hidden] {
+  display:none !important;
+}
+
 .sbi-plan-form input,
 .sbi-plan-form select,
 .sbi-plan-form textarea {
@@ -3563,14 +3564,17 @@ function embedCode(state) {
             <span class="sbi-host">${escapeHtml(state.hostLine)}</span>
             <p class="sbi-message">${escapeHtml(state.message)}</p>
 
+            ${state.responseFormEnabled === "yes" ? "" : `
             <div class="sbi-ribbon">
               <span><strong>${escapeHtml(state.dateDisplay)}</strong></span>
               <span>${escapeHtml(state.timeDisplay)}</span>
             </div>
+            `}
           </div>
           ${imageMarkup}
         </div>
 
+        ${state.responseFormEnabled === "yes" ? "" : `
         <div class="sbi-details">
           <div class="sbi-detail">
             <div class="sbi-detail-icon">📅</div>
@@ -3595,6 +3599,7 @@ function embedCode(state) {
             </div>
           </div>
         </div>
+        `}
 
         ${recipientPlanningMarkup(state)}
 
