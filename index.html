@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8dce7">
-  <meta name="app-build" content="calendar-confirmation-top-17">
+  <meta name="app-build" content="bottom-calendar-final-18">
   <title>Small Batch Invite Studio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -521,10 +521,11 @@
     }
 
     .preview-actions {
-      position:absolute;
-      z-index:20;
-      top:18px;
-      right:18px;
+      position:relative;
+      z-index:30;
+      display:flex;
+      justify-content:center;
+      padding:0 24px 34px;
     }
 
     .calendar-preview-wrap {
@@ -550,15 +551,19 @@
 
     .calendar-choice-menu {
       position:absolute;
-      top:calc(100% + 9px);
-      right:0;
-      width:245px;
+      z-index:1000;
+      top:auto;
+      bottom:calc(100% + 10px);
+      left:50%;
+      right:auto;
+      width:min(280px,calc(100vw - 46px));
       padding:9px;
-      border:1px solid rgba(111,77,93,.13);
+      border:1px solid rgba(111,77,93,.16);
       border-radius:17px;
-      background:white;
-      box-shadow:0 18px 38px rgba(80,50,65,.18);
+      background:#fff;
+      box-shadow:0 20px 44px rgba(80,50,65,.24);
       text-align:left;
+      transform:translateX(-50%);
     }
 
     .calendar-choice-menu[hidden] {
@@ -1082,16 +1087,7 @@
       }
 
       .preview-actions {
-        position:static;
-        display:flex;
-        justify-content:center;
-        padding:14px 12px 8px;
-      }
-
-      .calendar-choice-menu {
-        left:50%;
-        right:auto;
-        transform:translateX(-50%);
+        padding:0 12px 28px;
       }
 
       .preview-hero {
@@ -2101,26 +2097,6 @@ function previewMarkup(state) {
 
       <article class="preview-card">
         <div class="preview-inner">
-          <div class="preview-actions">
-            <div class="calendar-preview-wrap">
-              <button class="calendar-preview" type="button" data-preview-calendar-toggle>
-                📅 Add to Calendar
-              </button>
-
-              <div class="calendar-choice-menu" data-preview-calendar-menu hidden>
-                <button type="button" data-preview-device-calendar>
-                  Apple / Phone Calendar
-                  <small>Opens or downloads a standard calendar event file.</small>
-                </button>
-
-                <button type="button" data-preview-google-calendar>
-                  Google Calendar
-                  <small>Downloads the event file for Google Calendar or another compatible app.</small>
-                </button>
-              </div>
-            </div>
-          </div>
-
           <section class="preview-hero">
             <div>
               <div class="preview-eyebrow">${escapeHtml(state.topLabel)}</div>
@@ -2170,6 +2146,26 @@ function previewMarkup(state) {
 
           <div class="closing-wrap">
             <div class="closing">${escapeHtml(state.closing)}</div>
+          </div>
+
+          <div class="preview-actions">
+            <div class="calendar-preview-wrap">
+              <button class="calendar-preview" type="button" data-preview-calendar-toggle>
+                📅 Add to Your Calendar
+              </button>
+
+              <div class="calendar-choice-menu" data-preview-calendar-menu hidden>
+                <button type="button" data-preview-device-calendar>
+                  Apple / Phone Calendar
+                  <small>Downloads a standard calendar event file.</small>
+                </button>
+
+                <button type="button" data-preview-google-calendar>
+                  Google Calendar
+                  <small>Downloads the same event file for a compatible calendar app.</small>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </article>
@@ -2411,6 +2407,13 @@ function sbiCalendarRuntime(runtimeConfig) {
   const showDownloadConfirmation = () => {
     downloadFile.textContent = fileName();
     downloadOverlay.hidden = false;
+
+    setTimeout(() => {
+      downloadOverlay.scrollIntoView({
+        behavior:"smooth",
+        block:"center"
+      });
+    },100);
   };
 
   const closeDownloadConfirmation = () => {
@@ -3123,10 +3126,11 @@ function embedCode(state) {
 }
 
 .sbi-actions {
-  position:absolute;
-  z-index:20;
-  top:18px;
-  right:18px;
+  position:relative;
+  z-index:30;
+  display:flex;
+  justify-content:center;
+  padding:0 24px 34px;
 }
 
 .sbi-calendar-wrap {
@@ -3153,15 +3157,19 @@ function embedCode(state) {
 
 .sbi-calendar-menu {
   position:absolute;
-  top:calc(100% + 9px);
-  right:0;
-  width:245px;
+  z-index:1000;
+  top:auto;
+  bottom:calc(100% + 10px);
+  left:50%;
+  right:auto;
+  width:min(280px,calc(100vw - 46px));
   padding:9px;
-  border:1px solid rgba(111,77,93,.13);
+  border:1px solid rgba(111,77,93,.16);
   border-radius:17px;
-  background:white;
-  box-shadow:0 18px 38px rgba(80,50,65,.18);
+  background:#fff;
+  box-shadow:0 20px 44px rgba(80,50,65,.24);
   text-align:left;
+  transform:translateX(-50%);
 }
 
 .sbi-calendar-menu[hidden] {
@@ -3199,17 +3207,12 @@ function embedCode(state) {
 }
 
 .sbi-download-overlay {
-  position:fixed;
-  inset:0;
-  z-index:2147483647;
-  display:flex;
-  align-items:flex-start;
-  justify-content:center;
-  padding:18px 20px;
-  background:rgba(44,31,39,.45);
-  backdrop-filter:blur(5px);
-  -webkit-backdrop-filter:blur(5px);
-  overflow:auto;
+  position:relative;
+  z-index:25;
+  display:block;
+  margin:0 24px 18px;
+  padding:0;
+  background:transparent;
 }
 
 .sbi-download-overlay[hidden] {
@@ -3219,11 +3222,12 @@ function embedCode(state) {
 .sbi-download-card {
   position:relative;
   width:min(100%,430px);
-  margin-top:8px;
-  padding:24px;
-  border-radius:24px;
+  margin:0 auto;
+  padding:22px 18px;
+  border:1px solid rgba(111,77,93,.14);
+  border-radius:22px;
   background:white;
-  box-shadow:0 28px 70px rgba(44,31,39,.28);
+  box-shadow:0 18px 40px rgba(44,31,39,.14);
   text-align:center;
 }
 
@@ -3769,16 +3773,7 @@ function embedCode(state) {
   }
 
   .sbi-actions {
-    position:static;
-    display:flex;
-    justify-content:center;
-    padding:14px 12px 8px;
-  }
-
-  .sbi-calendar-menu {
-    left:50%;
-    right:auto;
-    transform:translateX(-50%);
+    padding:0 12px 28px;
   }
 
   .sbi-hero {
@@ -3905,11 +3900,10 @@ function embedCode(state) {
 
 @media (max-width:420px) {
   .sbi-download-overlay {
-    padding:10px 12px;
+    margin:0 12px 16px;
   }
 
   .sbi-download-card {
-    margin-top:0;
     padding:20px 16px;
     border-radius:20px;
   }
@@ -3956,26 +3950,6 @@ function embedCode(state) {
 
     <article class="sbi-card">
       <div class="sbi-inner">
-        <div class="sbi-actions">
-          <div class="sbi-calendar-wrap">
-            <button class="sbi-calendar" type="button" data-sbi-calendar-toggle>
-              📅 Add to Calendar
-            </button>
-
-            <div class="sbi-calendar-menu" data-sbi-calendar-menu hidden>
-              <button type="button" data-sbi-device-calendar>
-                Apple / Phone Calendar
-                <small>Opens or downloads a standard calendar event.</small>
-              </button>
-
-              <button type="button" data-sbi-google-calendar>
-                Google Calendar
-                <small>Downloads the event file for Google Calendar or another compatible app.</small>
-              </button>
-            </div>
-          </div>
-        </div>
-
         <div class="sbi-hero">
           <div>
             <div class="sbi-eyebrow">${escapeHtml(state.topLabel)}</div>
@@ -4026,21 +4000,41 @@ function embedCode(state) {
         <div class="sbi-closing-wrap">
           <div class="sbi-closing">${escapeHtml(state.closing)}</div>
         </div>
+
+        <div class="sbi-download-overlay" data-sbi-download-overlay hidden>
+          <div class="sbi-download-card" role="status" aria-live="polite">
+            <div class="sbi-download-icon">📅</div>
+            <h3>Calendar Event Downloaded</h3>
+            <p>
+              You’ve successfully downloaded the calendar event.
+              Open your Downloads folder and tap the most recently downloaded event file to add it to your calendar.
+            </p>
+            <span class="sbi-download-file" data-sbi-download-file></span>
+            <button type="button" data-sbi-download-close>Got It</button>
+          </div>
+        </div>
+
+        <div class="sbi-actions">
+          <div class="sbi-calendar-wrap">
+            <button class="sbi-calendar" type="button" data-sbi-calendar-toggle>
+              📅 Add to Your Calendar
+            </button>
+
+            <div class="sbi-calendar-menu" data-sbi-calendar-menu hidden>
+              <button type="button" data-sbi-device-calendar>
+                Apple / Phone Calendar
+                <small>Downloads a standard calendar event file.</small>
+              </button>
+
+              <button type="button" data-sbi-google-calendar>
+                Google Calendar
+                <small>Downloads the same event file for a compatible calendar app.</small>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </article>
-  </div>
-
-  <div class="sbi-download-overlay" data-sbi-download-overlay hidden>
-    <div class="sbi-download-card" role="dialog" aria-modal="true" aria-label="Calendar event downloaded">
-      <div class="sbi-download-icon">📅</div>
-      <h3>Calendar Event Downloaded</h3>
-      <p>
-        You’ve successfully downloaded the calendar event.
-        Open your Downloads folder and tap the most recently downloaded event file to add it to your calendar.
-      </p>
-      <span class="sbi-download-file" data-sbi-download-file></span>
-      <button type="button" data-sbi-download-close>Got It</button>
-    </div>
   </div>
 </section>
 
