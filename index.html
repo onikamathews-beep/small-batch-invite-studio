@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8dce7">
-  <meta name="app-build" content="single-default-per-event-bottom-calendar-20">
+  <meta name="app-build" content="persistent-response-endpoint-21">
   <title>Small Batch Invite Studio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1678,7 +1678,7 @@ const DEFAULTS = {
   invitationId:"",
   invitationToken:"",
   planWeekStart:"",
-  responseEndpoint:"",
+  responseEndpoint:"https://script.google.com/macros/s/AKfycby1tYhltubVBaqjWd069FdJXiTDd1byBsLvem4ug14OgHE0RCw_F-lYKSFcH06ODJQ/exec",
   planningIntro:"Please fill in the missing details for the plans below.",
   planConfig:{
     monday:{enabled:false,service:false,meeting:false,other:false},
@@ -1918,7 +1918,9 @@ function applyEventTypeDefault(templateName,{createIdentity=true,showNotice=true
   const defaultSample = DEFAULT_EVENT_SAMPLES[templateName] || DEFAULT_EVENT_SAMPLES.custom;
   const base = TEMPLATES[templateName] || TEMPLATES.custom;
   const merged = {...base,...defaultSample};
-  const savedEndpoint = fields.responseEndpoint.value;
+  const savedEndpoint =
+    fields.responseEndpoint.value.trim() ||
+    "https://script.google.com/macros/s/AKfycby1tYhltubVBaqjWd069FdJXiTDd1byBsLvem4ug14OgHE0RCw_F-lYKSFcH06ODJQ/exec";
 
   fields.template.value = templateName;
 
@@ -1984,6 +1986,11 @@ function writeState(state) {
     if (id === "template") return;
     fields[id].value = state[id] ?? "";
   });
+
+  if (!fields.responseEndpoint.value.trim()) {
+    fields.responseEndpoint.value =
+      "https://script.google.com/macros/s/AKfycby1tYhltubVBaqjWd069FdJXiTDd1byBsLvem4ug14OgHE0RCw_F-lYKSFcH06ODJQ/exec";
+  }
 
   planConfig = normalizePlanConfig(state.planConfig);
   ensureInvitationIdentity();
@@ -4566,6 +4573,7 @@ function resetApp() {
   writeState({
     ...DEFAULTS,
     ...DEFAULT_EVENT_SAMPLES.service,
+    responseEndpoint:"https://script.google.com/macros/s/AKfycby1tYhltubVBaqjWd069FdJXiTDd1byBsLvem4ug14OgHE0RCw_F-lYKSFcH06ODJQ/exec",
     template:"service",
     invitationId:identity.id,
     invitationToken:identity.token
