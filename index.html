@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8dce7">
-  <meta name="app-build" content="bottom-calendar-final-18">
+  <meta name="app-build" content="single-default-per-event-bottom-calendar-20">
   <title>Small Batch Invite Studio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1338,7 +1338,7 @@
       </section>
 
       <section class="section">
-        <h2>Add to Calendar</h2>
+        <h2>Add to Your Calendar</h2>
         <label>Calendar title<input id="calendarTitle" type="text"></label>
         <label>Calendar description<textarea id="calendarDescription"></textarea></label>
         <div class="two">
@@ -1549,6 +1549,107 @@ const TEMPLATES = {
     closing:"See you soon!",
     calendarTitle:"Our Event",
     calendarDescription:"Event details."
+  }
+};
+
+const DEFAULT_EVENT_SAMPLES = {
+  service:{
+    topLabel:"See You Soon!",
+    title:"Service Plans",
+    hostLine:"The Mitchel Family",
+    message:"We’re so glad you’ll be joining us for service! Thank you for making the drive up to Superior. We’re looking forward to spending the day together.",
+    closing:"We can’t wait to see you!",
+    dateDisplay:"Saturday, August 15, 2026",
+    timeDisplay:"9:30 AM to 2:30 PM",
+    venueName:"Kingdom Hall",
+    streetAddress:"639 W Hill St",
+    cityStateZip:"Superior, AZ 85173",
+    mapsUrl:"https://www.google.com/maps/search/?api=1&query=639+W+Hill+St+Superior+AZ+85173",
+    calendarTitle:"Service Plans with the Mitchel Family",
+    calendarDescription:"Service and time together in Superior.",
+    startDateTime:"2026-08-15T09:30",
+    endDateTime:"2026-08-15T14:30",
+    responseFormEnabled:"no"
+  },
+
+  serviceTrip:{
+    topLabel:"Service Trip Plans",
+    title:"Sedona Service Weekend",
+    hostLine:"The Mathews",
+    message:"We’re looking forward to traveling up to Sedona and spending the weekend with you. To help us prepare for our trip, can you please fill in the times, addresses and any helpful notes below?",
+    closing:"We’re really looking forward to the trip and the encouraging time together!",
+    calendarTitle:"Sedona Service Weekend",
+    calendarDescription:"Service, the congregation meeting and time together in Sedona.",
+    responseFormEnabled:"yes",
+    invitationLabel:"Sedona Service Weekend",
+    planWeekStart:"2026-09-07",
+    planningIntro:"Please fill in the times, addresses and notes for the plans below.",
+    planConfig:{
+      monday:{enabled:false,service:false,meeting:false,other:false},
+      tuesday:{enabled:false,service:false,meeting:false,other:false},
+      wednesday:{enabled:false,service:false,meeting:false,other:false},
+      thursday:{enabled:false,service:false,meeting:false,other:false},
+      friday:{enabled:true,service:true,meeting:false,other:false},
+      saturday:{enabled:true,service:false,meeting:true,other:false},
+      sunday:{enabled:true,service:true,meeting:false,other:false}
+    }
+  },
+
+  family:{
+    topLabel:"You’re Invited",
+    title:"Family Worship",
+    hostLine:"Together at Our Place",
+    message:"We’re looking forward to spending time together for family worship, a meal and encouraging conversation.",
+    closing:"We’re glad we get to share this evening together!",
+    dateDisplay:"Friday, August 21, 2026",
+    timeDisplay:"6:00 PM to 8:30 PM",
+    venueName:"Our Home",
+    streetAddress:"123 Example Ave",
+    cityStateZip:"Your City, AZ 85000",
+    mapsUrl:"https://www.google.com/maps/search/?api=1&query=123+Example+Ave",
+    calendarTitle:"Family Worship Evening",
+    calendarDescription:"Family worship and time together.",
+    startDateTime:"2026-08-21T18:00",
+    endDateTime:"2026-08-21T20:30",
+    responseFormEnabled:"no"
+  },
+
+  dinner:{
+    topLabel:"Dinner Plans",
+    title:"Dinner Together",
+    hostLine:"Good Food and Good Company",
+    message:"We’re looking forward to having you over for dinner and spending an easy evening together.",
+    closing:"Come hungry. We’ll take care of the rest!",
+    dateDisplay:"Saturday, August 22, 2026",
+    timeDisplay:"6:00 PM to 8:30 PM",
+    venueName:"Our Home",
+    streetAddress:"123 Example Ave",
+    cityStateZip:"Your City, AZ 85000",
+    mapsUrl:"https://www.google.com/maps/search/?api=1&query=123+Example+Ave",
+    calendarTitle:"Dinner Together",
+    calendarDescription:"Dinner together at our place.",
+    startDateTime:"2026-08-22T18:00",
+    endDateTime:"2026-08-22T20:30",
+    responseFormEnabled:"no"
+  },
+
+  custom:{
+    topLabel:"Save the Date",
+    title:"You’re Invited",
+    hostLine:"Hosted with Care",
+    message:"We’re looking forward to spending this time together.",
+    closing:"See you soon!",
+    dateDisplay:"Saturday, August 15, 2026",
+    timeDisplay:"2:00 PM to 5:00 PM",
+    venueName:"Event Location",
+    streetAddress:"123 Example Ave",
+    cityStateZip:"Your City, AZ 85000",
+    mapsUrl:"https://www.google.com/maps/search/?api=1&query=123+Example+Ave",
+    calendarTitle:"Our Event",
+    calendarDescription:"Event details.",
+    startDateTime:"2026-08-15T14:00",
+    endDateTime:"2026-08-15T17:00",
+    responseFormEnabled:"no"
   }
 };
 
@@ -1804,6 +1905,69 @@ function renderPlanBuilder() {
   planningSettings.hidden = fields.responseFormEnabled.value !== "yes";
 }
 
+function sampleControlledFieldIds() {
+  return [
+    "topLabel","title","hostLine","message","closing",
+    "dateDisplay","timeDisplay","venueName","streetAddress","cityStateZip","mapsUrl",
+    "calendarTitle","calendarDescription","startDateTime","endDateTime",
+    "responseFormEnabled","invitationLabel","planWeekStart","planningIntro"
+  ];
+}
+
+function applyEventTypeDefault(templateName,{createIdentity=true,showNotice=true}={}) {
+  const defaultSample = DEFAULT_EVENT_SAMPLES[templateName] || DEFAULT_EVENT_SAMPLES.custom;
+  const base = TEMPLATES[templateName] || TEMPLATES.custom;
+  const merged = {...base,...defaultSample};
+  const savedEndpoint = fields.responseEndpoint.value;
+
+  fields.template.value = templateName;
+
+  sampleControlledFieldIds().forEach(id => {
+    if (!fields[id]) return;
+
+    if (Object.prototype.hasOwnProperty.call(merged,id)) {
+      fields[id].value = merged[id] ?? "";
+    } else if (
+      [
+        "dateDisplay","timeDisplay","venueName","streetAddress","cityStateZip","mapsUrl",
+        "startDateTime","endDateTime","invitationLabel","planWeekStart"
+      ].includes(id)
+    ) {
+      fields[id].value = "";
+    }
+  });
+
+  fields.responseEndpoint.value = savedEndpoint;
+
+  planConfig = merged.planConfig
+    ? normalizePlanConfig(merged.planConfig)
+    : normalizePlanConfig(DEFAULTS.planConfig);
+
+  if (merged.responseFormEnabled !== "yes") {
+    fields.responseFormEnabled.value = "no";
+  }
+
+  if (createIdentity && merged.responseFormEnabled === "yes") {
+    const identity = generateInvitationIdentity();
+    fields.invitationId.value = identity.id;
+    fields.invitationToken.value = identity.token;
+  }
+
+  renderPlanBuilder();
+  render();
+
+  if (showNotice) {
+    const eventName =
+      fields.template.options[fields.template.selectedIndex]?.text || "Event";
+
+    notify(
+      "success",
+      `${eventName} example loaded`,
+      "The invitation and any included questions are prefilled, but every field remains editable."
+    );
+  }
+}
+
 function readState() {
   const state = {};
   fieldIds.forEach(id => state[id] = fields[id].value);
@@ -1813,7 +1977,11 @@ function readState() {
 }
 
 function writeState(state) {
+  const templateName = state.template || "service";
+  fields.template.value = templateName;
+
   fieldIds.forEach(id => {
+    if (id === "template") return;
     fields[id].value = state[id] ?? "";
   });
 
@@ -4397,6 +4565,8 @@ function resetApp() {
   const identity = generateInvitationIdentity();
   writeState({
     ...DEFAULTS,
+    ...DEFAULT_EVENT_SAMPLES.service,
+    template:"service",
     invitationId:identity.id,
     invitationToken:identity.token
   });
@@ -4405,40 +4575,7 @@ function resetApp() {
 }
 
 function applyTemplate(name) {
-  const template = TEMPLATES[name];
-  if (!template) return;
-
-  fields.topLabel.value = template.topLabel;
-  fields.title.value = template.title;
-  fields.hostLine.value = template.hostLine;
-  fields.message.value = template.message;
-  fields.closing.value = template.closing;
-  fields.calendarTitle.value = template.calendarTitle;
-  fields.calendarDescription.value = template.calendarDescription;
-
-  [
-    "dateDisplay","timeDisplay","venueName","streetAddress","cityStateZip",
-    "mapsUrl","responseFormEnabled","invitationLabel","planningIntro"
-  ].forEach(id => {
-    if (Object.prototype.hasOwnProperty.call(template,id)) {
-      fields[id].value = template[id];
-    }
-  });
-
-  if (template.planConfig) {
-    planConfig = normalizePlanConfig(template.planConfig);
-  } else if (name !== "serviceTrip") {
-    fields.responseFormEnabled.value = "no";
-  }
-
-  if (name === "serviceTrip") {
-    const identity = generateInvitationIdentity();
-    fields.invitationId.value = identity.id;
-    fields.invitationToken.value = identity.token;
-  }
-
-  renderPlanBuilder();
-  render();
+  applyEventTypeDefault(name);
 }
 
 buildThemeButtons();
@@ -4451,12 +4588,20 @@ try {
 } catch {}
 
 const initialIdentity = generateInvitationIdentity();
-writeState({
+const initialState = {
   ...DEFAULTS,
   invitationId:initialIdentity.id,
   invitationToken:initialIdentity.token,
   ...(savedState || {})
-});
+};
+
+if (!savedState) {
+  Object.assign(initialState,DEFAULT_EVENT_SAMPLES.service,{
+    template:"service"
+  });
+}
+
+writeState(initialState);
 hostingWarning.classList.toggle("show",!isHosted());
 
 Object.values(fields).forEach(field => {
